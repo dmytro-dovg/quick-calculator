@@ -195,6 +195,76 @@ function TestWhitespace:testUnaryPlusWithSpaces()
     luaunit.assertEquals(parse("+ 5 + 3"), 8)
 end
 
+-- Single-argument functions
+TestFunctions = {}
+
+function TestFunctions:testSqrt()
+    luaunit.assertEquals(parse("sqrt(9)"), 3)
+end
+
+function TestFunctions:testAbs()
+    luaunit.assertEquals(parse("abs(-7)"), 7)
+end
+
+function TestFunctions:testFloor()
+    luaunit.assertEquals(parse("floor(3.9)"), 3)
+end
+
+function TestFunctions:testCeil()
+    luaunit.assertEquals(parse("ceil(3.1)"), 4)
+end
+
+function TestFunctions:testCosOfZero()
+    luaunit.assertEquals(parse("cos(0)"), 1)
+end
+
+function TestFunctions:testLogBase10()
+    luaunit.assertAlmostEquals(parse("log(1000)"), 3, 0.0001)
+end
+
+function TestFunctions:testLnOfE()
+    luaunit.assertAlmostEquals(parse("ln(e)"), 1, 0.0001)
+end
+
+function TestFunctions:testFunctionArgumentIsExpression()
+    luaunit.assertEquals(parse("sqrt(2+7*2)"), 4)
+end
+
+function TestFunctions:testFunctionInExpression()
+    luaunit.assertEquals(parse("2*sqrt(9)+1"), 7)
+end
+
+function TestFunctions:testFunctionResultRaisedToPower()
+    luaunit.assertEquals(parse("sqrt(9)^2"), 9)
+end
+
+function TestFunctions:testNestedFunctions()
+    luaunit.assertEquals(parse("sqrt(sqrt(16))"), 2)
+end
+
+function TestFunctions:testWhitespaceBeforeParen()
+    luaunit.assertEquals(parse("sqrt (9)"), 3)
+end
+
+-- Named constants
+TestConstants = {}
+
+function TestConstants:testPi()
+    luaunit.assertAlmostEquals(parse("pi"), math.pi, 0.0001)
+end
+
+function TestConstants:testE()
+    luaunit.assertAlmostEquals(parse("e"), math.exp(1), 0.0001)
+end
+
+function TestConstants:testConstantInExpression()
+    luaunit.assertAlmostEquals(parse("2*pi"), 2 * math.pi, 0.0001)
+end
+
+function TestConstants:testCosOfPi()
+    luaunit.assertAlmostEquals(parse("cos(pi)"), -1, 0.0001)
+end
+
 -- Malformed input and errors
 TestErrors = {}
 
@@ -243,7 +313,7 @@ function TestErrors:testEmptyParens()
 end
 
 function TestErrors:testInvalidCharacter()
-    luaunit.assertError(parse, "2+a")
+    luaunit.assertError(parse, "2+@")
 end
 
 function TestErrors:testParenWithNoOperator()
@@ -252,6 +322,26 @@ end
 
 function TestErrors:testImplicitConcatenation()
     luaunit.assertError(parse, "2 3")
+end
+
+function TestErrors:testUnknownFunction()
+    luaunit.assertError(parse, "foo(2)")
+end
+
+function TestErrors:testUnknownIdentifier()
+    luaunit.assertError(parse, "2+a")
+end
+
+function TestErrors:testFunctionWithoutParens()
+    luaunit.assertError(parse, "sqrt 9")
+end
+
+function TestErrors:testConstantWithImplicitMultiplication()
+    luaunit.assertError(parse, "2pi")
+end
+
+function TestErrors:testFunctionMissingClosingParen()
+    luaunit.assertError(parse, "sqrt(9")
 end
 
 os.exit(luaunit.LuaUnit.run())
