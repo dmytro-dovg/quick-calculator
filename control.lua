@@ -7,6 +7,7 @@ local Calculator = require "calculator"
 ---@field input_textfield LuaGuiElement?
 ---@field result_textfield LuaGuiElement?
 ---@field cross_button LuaGuiElement?
+---@field warning_icon LuaGuiElement?
 
 ---@class PlayerState
 ---@field gui GuiState
@@ -56,7 +57,7 @@ local function show(player_index)
             lose_focus_on_confirm = true,
         }
         input_textfield.style.height = 28
-        input_textfield.style.width = 300
+        input_textfield.style.width = 320
         input_textfield.style.left_padding = 8
         input_textfield.style.right_padding = 8
         input_textfield.style.top_padding = 4
@@ -85,6 +86,7 @@ local function show(player_index)
         section_2.style.left_padding = 8
         section_2.style.right_padding = 8
         section_2.style.horizontal_align = "center"
+        section_2.style.vertical_align = "center"
 
         local result_label = section_2.add {
             type = "label",
@@ -92,7 +94,7 @@ local function show(player_index)
             style = "quick-calculator_orange-label",
         }
         result_label.style.vertical_align = "center"
-        result_label.style.height = 16
+        result_label.style.bottom_padding = 4
 
         local result_textfield = section_2.add {
             type = "textfield",
@@ -101,11 +103,25 @@ local function show(player_index)
             enabled = false,
             lose_focus_on_confirm = true,
         }
-        result_textfield.style.width = 300
-        result_textfield.style.height = 20
+
         result_textfield.style.horizontal_align = "left"
         result_textfield.style.disabled_font_color = { 0.8, 0.8, 0.8 }
         result_textfield.style.font = "default-large-semibold"
+        result_textfield.style.horizontally_stretchable = true
+        result_textfield.style.maximal_width = 0
+
+        local icons = section_2.add { type = "flow", direction = "horizontal", }
+        icons.style.vertical_align = "center"
+        local warning_icon = icons.add {
+            type = "sprite",
+            sprite = "utility/warning_white",
+            visible = false,
+        }
+        local info_icon = icons.add {
+            type = "sprite",
+            sprite = "quick-calculator_info",
+            tooltip = "TODO: supported operations",
+        }
 
         local separator_2 = content.add { type = "line", direction ="horizontal", }
 
@@ -143,6 +159,7 @@ local function show(player_index)
         storage.players[player_index].gui.input_textfield = input_textfield
         storage.players[player_index].gui.result_textfield = result_textfield
         storage.players[player_index].gui.cross_button = cross_button
+        storage.players[player_index].gui.warning_icon = warning_icon
 
         input_textfield.focus()
         player.opened = frame
@@ -196,14 +213,19 @@ script.on_event(defines.events.on_gui_text_changed, function (event)
     local text = event.text
     if text:len() == 0 then
         result_textfield.text = ""
+        storage.players[event.player_index].gui.warning_icon.visible = false
+        return
     end
 
     local success, result = pcall(Calculator.parseExpression, text)
     if success and result then
         C.d("Result: "  .. result)
+        storage.players[event.player_index].gui.warning_icon.visible = false
         result_textfield.text = tostring(result)
     else
         C.d("Error: " .. result)
+        storage.players[event.player_index].gui.warning_icon.visible = true
+        storage.players[event.player_index].gui.warning_icon.tooltip = result
     end
 end)
 

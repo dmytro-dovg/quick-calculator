@@ -1,11 +1,21 @@
 
 data:extend({
-  {
-    type = "font",
-    name = "quick-calculator_orange-large",
-    from = "default-semibold",
-    size = 20
-  }
+    {
+        type = "font",
+        name = "quick-calculator_orange-large",
+        from = "default-semibold",
+        size = 20
+    },
+    {
+        type = "sprite",
+        name = "quick-calculator_info",
+        filename = "__base__/graphics/icons/info.png",
+        size = 32,
+        scale = 0.5,
+        mipmap_count = 3,
+        position = { 64, 0 },
+        flags = {"gui-icon"},
+    },
 })
 
 local styles = data.raw["gui-style"].default
