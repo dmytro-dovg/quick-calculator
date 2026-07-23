@@ -1,9 +1,40 @@
 local Calculator = {}
 
+local functions = {
+    sqrt = math.sqrt,
+    abs = math.abs,
+    exp = math.exp,
+    ln = math.log,
+    log = function(x) return math.log(x, 10) end,
+    sin = math.sin,
+    cos = math.cos,
+    tan = math.tan,
+    asin = math.asin,
+    acos = math.acos,
+    atan = math.atan,
+    floor = math.floor,
+    ceil = math.ceil,
+}
+
+local constants = {
+    pi = math.pi,
+    e  = math.exp(1),
+}
+
 --- Parse and evaluate an arithmetic expression string.
---- Supported: + - * / %, unary minus, ^ and **, factorial (single only) and parentheses.
+---
+--- Supported syntax:
+---   * Arithmetic:   + - * / %
+---   * Unary signs:  -x, +x
+---   * Exponent:     ^ or **
+---   * Factorial:    x! (single "!" only)
+---   * Grouping:     ( )
+---   * Functions:    sqrt, abs, exp, ln, log, sin, cos, tan,
+---                   asin, acos, atan, floor, ceil (trig in radians)
+---   * Constants:    pi, e
+---
 ---@param expression string
----@return number
+---@return number?
 function Calculator.parseExpression(expression)
     local cursor = 1
 
@@ -43,6 +74,13 @@ function Calculator.parseExpression(expression)
         return num
     end
 
+    local function consumeIdentifier()
+        skip_spaces()
+        local start = cursor
+        while expression:sub(cursor, cursor):match("%a") do advance() end
+        return expression:sub(start, cursor - 1)
+    end
+
     local function factorial(n)
         if n < 0 then
             fail("factorial of negative number '" .. n .. "'")
@@ -72,6 +110,27 @@ function Calculator.parseExpression(expression)
             return value
         elseif character == "" then
             fail("unexpected end of input, expected a number or '('")
+        elseif character:match("%a") then
+            local name = consumeIdentifier()
+            if next_character() == "(" then
+                local fn = functions[name]
+                if not fn then
+                    fail("unknown function '" .. name .. "'")
+                end
+                advance()
+                local argument = parse()
+                skip_spaces()
+                if next_character() ~= ")" then
+                    fail("expected closing ')'")
+                end
+                advance()
+                return fn(argument)
+            end
+            local value = constants[name]
+            if value == nil then
+                fail("unknown identifier '" .. name .. "'")
+            end
+            return value
         else
             return consumeNumber()
         end
