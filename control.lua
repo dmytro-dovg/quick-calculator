@@ -71,7 +71,7 @@ local function show(player_index)
             name = C.gui.cross_button,
             style = "frame_action_button",
             sprite = "utility/close",
-            tooltip = "Clear",
+            tooltip = { "gui-quick-calculator.clear-tooltip" },
             resize_to_sprite = false,
         }
         cross_button.style.left_margin = 8
@@ -121,7 +121,7 @@ local function show(player_index)
         local info_icon = icons.add {
             type = "sprite",
             sprite = "quick-calculator_info",
-            tooltip = "TODO: supported operations",
+            tooltip = { "gui-quick-calculator.info-tooltip" },
         }
 
         local separator_2 = content.add { type = "line", direction ="horizontal", }
