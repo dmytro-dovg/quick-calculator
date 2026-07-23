@@ -1,0 +1,162 @@
+local Calculator = {}
+
+--- Parse and evaluate an arithmetic expression string.
+--- Supported: + - * / %, unary minus, ^ and **, factorial (single only) and parentheses.
+---@param expression string
+---@return number
+function Calculator.parseExpression(expression)
+    local cursor = 1
+
+    local function advance(n)
+        n = n or 1
+        cursor = cursor + n
+    end
+
+    local function fail(message)
+        error(string.format("Parse error at %d: %s", cursor, message), 0)
+    end
+
+    local function skip_spaces()
+        while expression:sub(cursor, cursor) == " " do advance() end
+    end
+
+    local function next_characters(n)
+        skip_spaces()
+        return expression:sub(cursor, cursor + n - 1)
+    end
+
+    local function next_character()
+        return next_characters(1)
+    end
+
+    local function consumeNumber()
+        skip_spaces()
+        local start = cursor
+        while expression:sub(cursor, cursor):match("[%d%.]") do advance() end
+        if cursor == start then
+            fail("expected a number")
+        end
+        local num = tonumber(expression:sub(start, cursor - 1))
+        if not num then
+            fail("invalid number literal '" .. expression:sub(start, cursor - 1) .. "'")
+        end
+        return num
+    end
+
+    local function factorial(n)
+        if n < 0 then
+            fail("factorial of negative number '" .. n .. "'")
+        end
+        if n ~= math.floor(n) then
+            fail("factorial requires an integer, got " .. n)
+        end
+        local result = 1
+        for i = 2, n do
+            result = result * i
+        end
+        return result
+    end
+
+    local parse
+
+    local function parseAtom()
+        local character = next_character()
+        if character == "(" then
+            advance()
+            local value = parse()
+            skip_spaces()
+            if next_character() ~= ")" then
+                fail("expected closing ')'")
+            end
+            advance()
+            return value
+        elseif character == "" then
+            fail("unexpected end of input, expected a number or '('")
+        else
+            return consumeNumber()
+        end
+    end
+
+    local parseFactor
+
+    local function parsePostfix()
+        local value = parseAtom()
+        -- Only a single "!" is allowed
+        if next_character() == "!" then
+            advance()
+            value = factorial(value)
+        end
+        return value
+    end
+
+    local function parsePower()
+        local base = parsePostfix()
+        if next_characters(2) == "**" then
+            advance(2)
+            return base ^ parseFactor()
+        elseif next_character() == "^" then
+            advance()
+            return base ^ parseFactor()
+        end
+        return base
+    end
+
+
+    parseFactor = function()
+        if next_character() == "-" then
+            advance()
+            return -parseFactor()
+        end
+        return parsePower()
+    end
+
+    local function parseTerm()
+        local value = parseFactor()
+        while true do
+            local character = next_character()
+            if character == "*" then
+                advance()
+                value = value * parseFactor()
+            elseif character == "/" then
+                advance()
+                local divisor = parseFactor()
+                if divisor == 0 then
+                    fail("division by 0")
+                end
+                value = value / divisor
+            elseif character == "%" then
+                advance()
+                value = value % parseFactor()
+            else
+                break
+            end
+        end
+        return value
+    end
+
+    parse = function()
+        local value = parseTerm()
+        while true do
+            local character = next_character()
+            if character == "+" then
+                advance()
+                value = value + parseTerm()
+            elseif character == "-" then
+                advance()
+                value = value - parseTerm()
+            else
+                break
+            end
+        end
+        return value
+    end
+
+    local result = parse()
+    skip_spaces()
+    if cursor <= expression:len() then
+        fail("unexpected trailing input")
+    end
+    return result
+end
+
+return Calculator
