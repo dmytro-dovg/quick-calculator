@@ -3,6 +3,7 @@ local Calculator = require "calculator"
 
 ---@class GuiState
 ---@field claculator_frame LuaGuiElement?
+---@field input_frame LuaGuiElement?
 ---@field input_textfield LuaGuiElement?
 ---@field result_textfield LuaGuiElement?
 ---@field cross_button LuaGuiElement?
@@ -55,7 +56,7 @@ local function show(player_index)
             lose_focus_on_confirm = true,
         }
         input_textfield.style.height = 28
-        input_textfield.style.width = 240
+        input_textfield.style.width = 300
         input_textfield.style.left_padding = 8
         input_textfield.style.right_padding = 8
         input_textfield.style.top_padding = 4
@@ -83,14 +84,15 @@ local function show(player_index)
         section_2.style.top_padding = 2
         section_2.style.left_padding = 8
         section_2.style.right_padding = 8
-        section_2.style.vertical_align = "center"
         section_2.style.horizontal_align = "center"
 
         local result_label = section_2.add {
             type = "label",
-            caption = "=",
+            caption = { "gui-quick-calculator.result_label" },
             style = "quick-calculator_orange-label",
         }
+        result_label.style.vertical_align = "center"
+        result_label.style.height = 16
 
         local result_textfield = section_2.add {
             type = "textfield",
@@ -99,7 +101,8 @@ local function show(player_index)
             enabled = false,
             lose_focus_on_confirm = true,
         }
-        result_textfield.style.width = 240
+        result_textfield.style.width = 300
+        result_textfield.style.height = 20
         result_textfield.style.horizontal_align = "left"
         result_textfield.style.disabled_font_color = { 0.8, 0.8, 0.8 }
         result_textfield.style.font = "default-large-semibold"
@@ -120,7 +123,7 @@ local function show(player_index)
         local instruction_label = section_3.add {
             type = "label",
             style = "grey_label",
-            caption = "Press Esc or Enter to close"
+            caption = { "gui-quick-calculator.instructions" },
         }
         instruction_label.style.margin = 0
         instruction_label.style.horizontally_squashable = true
@@ -136,6 +139,7 @@ local function show(player_index)
         content.drag_target = frame
 
         storage.players[player_index].gui.claculator_frame = frame
+        storage.players[player_index].gui.input_frame = input_frame
         storage.players[player_index].gui.input_textfield = input_textfield
         storage.players[player_index].gui.result_textfield = result_textfield
         storage.players[player_index].gui.cross_button = cross_button
@@ -195,7 +199,7 @@ script.on_event(defines.events.on_gui_text_changed, function (event)
     end
 
     local success, result = pcall(Calculator.parseExpression, text)
-    if success then
+    if success and result then
         C.d("Result: "  .. result)
         result_textfield.text = tostring(result)
     else
