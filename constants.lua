@@ -10,9 +10,4 @@ C.gui = {
     cross_button = C.mod_name .. "-cross-button",
 }
 
-function C.d(msg)
-    if not C.debug.logging_enabled then return end
-    local message = "[quick-calculator]: " .. msg
-    localised_print(message)
-end
 return C

@@ -21,6 +21,22 @@ local constants = {
     e  = math.exp(1),
 }
 
+Calculator.Error = {
+    EXPECTED_NUMBER = "expected-number",
+    INVALID_NUMBER = "invalid-number",
+    FACTORIAL_NEGATIVE = "factorial-negative",
+    FACTORIAL_NON_INTEGER = "factorial-non-integer",
+    EXPECTED_CLOSING_PAREN = "expected-closing-paren",
+    EXPECTED_OPENING_PAREN = "expected-opening-paren",
+    UNEXPECTED_END = "unexpected-end",
+    UNKNOWN_FUNCTION = "unknown-function",
+    UNKNOWN_IDENTIFIER = "unknown-identifier",
+    DIVISION_BY_ZERO = "division-by-zero",
+    MODULO_BY_ZERO = "modulo-by-zero",
+    UNEXPECTED_TRAILING_INPUT = "unexpected-trailing-input",
+}
+local Error = Calculator.Error
+
 --- Parse and evaluate an arithmetic expression string.
 ---
 --- Supported syntax:
@@ -32,7 +48,6 @@ local constants = {
 ---   * Functions:    sqrt, abs, exp, ln, log, sin, cos, tan,
 ---                   asin, acos, atan, floor, ceil (trig in radians)
 ---   * Constants:    pi, e
----
 ---@param expression string
 ---@return number?
 function Calculator.parseExpression(expression)
@@ -43,8 +58,10 @@ function Calculator.parseExpression(expression)
         cursor = cursor + n
     end
 
-    local function fail(message)
-        error(string.format("Parse error at %d: %s", cursor, message), 0)
+    ---@param code string one of Calculator.Error
+    ---@param value any? optional detail for the message
+    local function fail(code, value)
+        error({ code = code, position = cursor, value = value }, 0)
     end
 
     local function skip_spaces()
@@ -65,11 +82,11 @@ function Calculator.parseExpression(expression)
         local start = cursor
         while expression:sub(cursor, cursor):match("[%d%.]") do advance() end
         if cursor == start then
-            fail("expected a number")
+            fail(Error.EXPECTED_NUMBER)
         end
         local num = tonumber(expression:sub(start, cursor - 1))
         if not num then
-            fail("invalid number literal '" .. expression:sub(start, cursor - 1) .. "'")
+            fail(Error.INVALID_NUMBER, expression:sub(start, cursor - 1))
         end
         return num
     end
@@ -83,10 +100,10 @@ function Calculator.parseExpression(expression)
 
     local function factorial(n)
         if n < 0 then
-            fail("factorial of negative number '" .. n .. "'")
+            fail(Error.FACTORIAL_NEGATIVE, n)
         end
         if n ~= math.floor(n) then
-            fail("factorial requires an integer, got " .. n)
+            fail(Error.FACTORIAL_NON_INTEGER, n)
         end
         local result = 1
         for i = 2, n do
@@ -104,24 +121,24 @@ function Calculator.parseExpression(expression)
             local value = parse()
             skip_spaces()
             if next_character() ~= ")" then
-                fail("expected closing ')'")
+                fail(Error.EXPECTED_CLOSING_PAREN)
             end
             advance()
             return value
         elseif character == "" then
-            fail("unexpected end of input")
+            fail(Error.UNEXPECTED_END)
         elseif character:match("%a") then
             local name = consumeIdentifier()
             local fn = functions[name]
             if next_character() == "(" then
                 if not fn then
-                    fail("unknown function '" .. name .. "'")
+                    fail(Error.UNKNOWN_FUNCTION, name)
                 end
                 advance()
                 local argument = parse()
                 skip_spaces()
                 if next_character() ~= ")" then
-                    fail("expected closing ')'")
+                    fail(Error.EXPECTED_CLOSING_PAREN)
                 end
                 advance()
                 return fn(argument)
@@ -129,9 +146,9 @@ function Calculator.parseExpression(expression)
             local value = constants[name]
             if value == nil then
                 if fn then
-                    fail("expected opening '('")
+                    fail(Error.EXPECTED_OPENING_PAREN, name)
                 end
-                fail("unknown identifier '" .. name .. "'")
+                fail(Error.UNKNOWN_IDENTIFIER, name)
             end
             return value
         else
@@ -186,14 +203,14 @@ function Calculator.parseExpression(expression)
                 advance()
                 local divisor = parseFactor()
                 if divisor == 0 then
-                    fail("division by 0")
+                    fail(Error.DIVISION_BY_ZERO)
                 end
                 value = value / divisor
             elseif character == "%" then
                 advance()
                 local divisor = parseFactor()
                 if divisor == 0 then
-                    fail("division by 0")
+                    fail(Error.MODULO_BY_ZERO)
                 end
                 value = value % divisor
             else
@@ -223,7 +240,7 @@ function Calculator.parseExpression(expression)
     local result = parse()
     skip_spaces()
     if cursor <= expression:len() then
-        fail("unexpected trailing input")
+        fail(Error.UNEXPECTED_TRAILING_INPUT)
     end
     return result
 end

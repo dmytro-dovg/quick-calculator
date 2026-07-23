@@ -1,4 +1,5 @@
 local C = require "constants"
+local Util = require "util"
 local Calculator = require "calculator"
 
 ---@class GuiState
@@ -218,14 +219,15 @@ script.on_event(defines.events.on_gui_text_changed, function (event)
     end
 
     local success, result = pcall(Calculator.parseExpression, text)
+    local warning_icon = storage.players[event.player_index].gui.warning_icon
     if success and result then
-        C.d("Result: "  .. result)
-        storage.players[event.player_index].gui.warning_icon.visible = false
+        Util.d("Result: "  .. result)
+        warning_icon.visible = false
         result_textfield.text = tostring(result)
     else
-        C.d("Error: " .. result)
-        storage.players[event.player_index].gui.warning_icon.visible = true
-        storage.players[event.player_index].gui.warning_icon.tooltip = result
+        Util.d("Error: " .. (type(result) == "table" and result.code or tostring(result)))
+        warning_icon.visible = true
+        warning_icon.tooltip = Util.localise_parse_error(result)
     end
 end)
 
