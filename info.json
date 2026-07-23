@@ -1,0 +1,11 @@
+{
+    "name": "quick-calculator",
+    "description": "Quick pop-up calculator.",
+    "version": "0.0.1",
+    "title": "Quick calculator",
+    "author": "imoth_f",
+    "factorio_version": "2.1",
+    "dependencies": [
+        "base >= 2.1"
+    ]
+}
