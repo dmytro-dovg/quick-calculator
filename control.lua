@@ -22,21 +22,26 @@ local function show(player_index)
     if not frame then
         local player = game.get_player(player_index)
         if not player then return end
+
         frame = player.gui.screen.add {
             type = "frame",
             name = C.gui.main_frame,
             direction = "vertical",
         }
+        frame.style.padding = 0
         frame.auto_center = true
 
-        local section_1 = frame.add {
-            type = "flow",
-            direction = "horizontal",
-        }
-        section_1.style.top_margin = 4
+        local content = frame.add { type = "flow", direction = "vertical", }
+        content.style.padding = 0
+        content.style.bottom_margin = 0
+
+        -- == Section 1 ==
+        local section_1 = content.add { type = "flow", direction = "horizontal", }
+        section_1.style.margin = 0
         section_1.style.bottom_margin = 4
+        section_1.style.padding = 8
+        section_1.style.bottom_padding = 0
         section_1.style.vertical_align = "center"
-        section_1.drag_target = frame
 
         local input_frame = section_1.add {
             type = "frame",
@@ -58,7 +63,6 @@ local function show(player_index)
         input_textfield.style.font_color = { 0.8, 0.8, 0.8 }
         input_textfield.style.font = "default-large-semibold"
 
-        -- Close button
         local cross_button = section_1.add {
             type = "sprite-button",
             name = C.gui.cross_button,
@@ -71,26 +75,23 @@ local function show(player_index)
         cross_button.style.size = 28
         cross_button.style.padding =0
 
-        local separator = frame.add {
-            type = "line",
-            direction ="horizontal",
-        }
-        separator.style.left_margin = 0
+        local separator_1 = content.add { type = "line", direction ="horizontal", }
+        separator_1.style.left_margin = 0
 
-
-        local section_2 = frame.add {
-            type = "flow",
-            direction = "horizontal",
-        }
+        -- == Section 2 ==
+        local section_2 = content.add { type = "flow", direction = "horizontal", }
+        section_2.style.top_padding = 2
+        section_2.style.left_padding = 8
+        section_2.style.right_padding = 8
         section_2.style.vertical_align = "center"
         section_2.style.horizontal_align = "center"
-        section_2.drag_target = frame
 
-        section_2.add {
+        local result_label = section_2.add {
             type = "label",
             caption = "=",
             style = "quick-calculator_orange-label",
         }
+
         local result_textfield = section_2.add {
             type = "textfield",
             style = "quick-calculator_result-textfield",
@@ -99,34 +100,40 @@ local function show(player_index)
             lose_focus_on_confirm = true,
         }
         result_textfield.style.width = 240
-        result_textfield.style.left_padding = 8
-        result_textfield.style.top_margin = 2
         result_textfield.style.horizontal_align = "left"
         result_textfield.style.disabled_font_color = { 0.8, 0.8, 0.8 }
         result_textfield.style.font = "default-large-semibold"
-        result_textfield.ignored_by_interaction = true
-        frame.add {
-            type = "line",
-            direction ="horizontal",
-        }
 
-        local section_3 = frame.add {
-            type = "flow",
-            direction = "vertical",
-        }
+        local separator_2 = content.add { type = "line", direction ="horizontal", }
+
+        -- == Section 3 ==
+        local section_3 = content.add { type = "flow", direction = "horizontal", }
+        section_3.style.bottom_padding = 2
         section_3.style.vertical_align = "center"
         section_3.style.horizontal_align = "center"
         section_3.style.horizontally_stretchable = true
-        section_3.drag_target = frame
+
+        local dragger_1 = section_3.add { type = "empty-widget", style = "draggable_space" }
+        dragger_1.style.vertically_stretchable = true
+        dragger_1.style.horizontally_stretchable = true
 
         local instruction_label = section_3.add {
             type = "label",
             style = "grey_label",
             caption = "Press Esc or Enter to close"
         }
-        instruction_label.style.horizontally_stretchable = true
-        instruction_label.style.horizontal_align = "center"
-        instruction_label.ignored_by_interaction = true
+        instruction_label.style.margin = 0
+        instruction_label.style.horizontally_squashable = true
+
+        local dragger_2 = section_3.add { type = "empty-widget", style = "draggable_space_header" }
+        dragger_2.style.horizontally_stretchable = true
+        dragger_2.style.vertically_stretchable = true
+
+        for _, element in pairs({ section_3, separator_1, separator_2, result_label, instruction_label }) do
+            element.ignored_by_interaction = true
+        end
+
+        content.drag_target = frame
 
         storage.players[player_index].gui.claculator_frame = frame
         storage.players[player_index].gui.input_textfield = input_textfield
@@ -167,14 +174,6 @@ commands.add_command("qcalc", nil, function (cmd)
     local player_index = cmd.player_index
     if not player_index or player_index < 1 then return end
     toggle(player_index)
-end)
-
-script.on_init(function()
-    storage.players = { }
-end)
-
-script.on_event(defines.events.on_player_joined_game, function(event)
-    init_player(event.player_index)
 end)
 
 script.on_event("quick-calculator-toggle", function(event)
@@ -223,4 +222,21 @@ end)
 script.on_event(defines.events.on_gui_confirmed, function (event)
     if event.element.name ~= C.gui.input_textfield then return end
     hide(event.player_index)
+end)
+
+script.on_init(function()
+    storage.players = { }
+end)
+
+script.on_event(defines.events.on_player_joined_game, function(event)
+    init_player(event.player_index)
+end)
+
+script.on_configuration_changed(function(event)
+    -- Close all open windows
+    for _, state in pairs(storage.players) do
+        local frame = state.gui.claculator_frame
+        if frame then frame.destroy() end
+    end
+    storage.players = { }
 end)
