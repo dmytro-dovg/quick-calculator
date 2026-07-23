@@ -109,11 +109,11 @@ function Calculator.parseExpression(expression)
             advance()
             return value
         elseif character == "" then
-            fail("unexpected end of input, expected a number or '('")
+            fail("unexpected end of input")
         elseif character:match("%a") then
             local name = consumeIdentifier()
+            local fn = functions[name]
             if next_character() == "(" then
-                local fn = functions[name]
                 if not fn then
                     fail("unknown function '" .. name .. "'")
                 end
@@ -128,6 +128,9 @@ function Calculator.parseExpression(expression)
             end
             local value = constants[name]
             if value == nil then
+                if fn then
+                    fail("expected opening '('")
+                end
                 fail("unknown identifier '" .. name .. "'")
             end
             return value
