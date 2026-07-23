@@ -219,7 +219,9 @@ script.on_event(defines.events.on_gui_click, function(event)
 end)
 
 script.on_event(defines.events.on_gui_closed, function(event)
-    if event.element.name ~= C.gui.main_frame then return end
+    local element = event.element
+    if not element then return end
+    if element.name ~= C.gui.main_frame then return end
     hide(event.player_index)
 end)
 
