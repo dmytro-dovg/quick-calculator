@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+die() {
+    local message=$1
+    printf "\e[31m%s\e[0m\n" "$message" >&2
+    exit 1
+}
+
+main() {
+    local tests_location=$1
+    [[ ! -d $tests_location ]] && die "error: $tests_location is not a directory"
+    if ! command -v lua &>/dev/null; then
+        die "error: lua not installed"
+    fi
+    local success=true
+    local test_file test_exit_code
+    for test_file in "$tests_location"/*.lua; do
+        lua "$test_file"
+        test_exit_code=$?
+        (( test_exit_code > 0 )) && success=false
+    done
+
+    if $success; then
+        printf "\e[32m%s\e[0m\n" "Testing succeeded!" >&2
+    else
+        die "Testing failed!"
+    fi
+}
+
+main "$@"
