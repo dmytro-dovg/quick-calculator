@@ -235,8 +235,10 @@ script.on_event(defines.events.on_gui_click, function(event)
     if event.element.name ~= C.gui.cross_button then return end
     local input_textfield = storage.players[event.player_index].gui.input_textfield
     local result_textfield = storage.players[event.player_index].gui.result_textfield
+    local warning_icon = storage.players[event.player_index].gui.warning_icon
     if input_textfield then
         input_textfield.text = ""
+        if warning_icon then warning_icon.visible = false end
         input_textfield.focus()
     end
     if result_textfield then result_textfield.text = "" end
