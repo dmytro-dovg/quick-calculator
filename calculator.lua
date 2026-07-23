@@ -106,6 +106,9 @@ function Calculator.parseExpression(expression)
         if next_character() == "-" then
             advance()
             return -parseFactor()
+        elseif next_character() == "+" then
+            advance()
+            return parseFactor()
         end
         return parsePower()
     end
@@ -126,7 +129,11 @@ function Calculator.parseExpression(expression)
                 value = value / divisor
             elseif character == "%" then
                 advance()
-                value = value % parseFactor()
+                local divisor = parseFactor()
+                if divisor == 0 then
+                    fail("division by 0")
+                end
+                value = value % divisor
             else
                 break
             end
