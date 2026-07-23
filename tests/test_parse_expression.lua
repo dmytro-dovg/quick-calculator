@@ -1,235 +1,257 @@
-package.path = "lib/luaunit/?.lua;" .. package.path
+package.path = "tests/lib/luaunit/?.lua;" .. package.path
 local luaunit = require("luaunit")
 
-package.path = "../?.lua;" .. package.path
+package.path = "?.lua;" .. package.path
 local Calculator = require "calculator"
 
--- Successes
+local parse = Calculator.parseExpression
 
-function testAddition()
-    luaunit.assertEquals(Calculator.parseExpression("2+3"), 5)
+-- Binary operators: + - * / %
+TestBinaryOperators = {}
+
+function TestBinaryOperators:testAddition()
+    luaunit.assertEquals(parse("2+3"), 5)
 end
 
-function testSubtraction()
-    luaunit.assertEquals(Calculator.parseExpression("10-4"), 6)
+function TestBinaryOperators:testSubtraction()
+    luaunit.assertEquals(parse("10-4"), 6)
 end
 
-function testMultiplication()
-    luaunit.assertEquals(Calculator.parseExpression("6*7"), 42)
+function TestBinaryOperators:testMultiplication()
+    luaunit.assertEquals(parse("6*7"), 42)
 end
 
-function testDivision()
-    luaunit.assertEquals(Calculator.parseExpression("20/4"), 5)
+function TestBinaryOperators:testDivision()
+    luaunit.assertEquals(parse("20/4"), 5)
 end
 
-function testExponent()
-    luaunit.assertEquals(Calculator.parseExpression("2^10"), 1024)
+function TestBinaryOperators:testFloatResult()
+    luaunit.assertAlmostEquals(parse("7/2"), 3.5, 0.0001)
 end
 
-function testModulo()
-    luaunit.assertEquals(Calculator.parseExpression("10%3"), 1)
+function TestBinaryOperators:testModulo()
+    luaunit.assertEquals(parse("10%3"), 1)
 end
 
-function testFactorial()
-    luaunit.assertEquals(Calculator.parseExpression("5!"), 120)
+function TestBinaryOperators:testNegativeModulo()
+    luaunit.assertEquals(parse("-10%3"), 2)
 end
 
-function testOperatorPrecedence()
-    luaunit.assertEquals(Calculator.parseExpression("2+3*4"), 14)
+function TestBinaryOperators:testModuloWithFloatOperand()
+    luaunit.assertAlmostEquals(parse("10.5%3"), 1.5, 0.0001)
 end
 
-function testParentheses()
-    luaunit.assertEquals(Calculator.parseExpression("(2+3)*4"), 20)
+-- Exponent: ^ and **
+TestExponent = {}
+
+function TestExponent:testExponent()
+    luaunit.assertEquals(parse("2^10"), 1024)
 end
 
-function testNestedFactorialAndExponent()
-    luaunit.assertEquals(Calculator.parseExpression("3!^2"), 36)
+function TestExponent:testDoubleStarExponentAlias()
+    luaunit.assertEquals(parse("2**3"), 8)
 end
 
-function testFloatResult()
-    luaunit.assertAlmostEquals(Calculator.parseExpression("7/2"), 3.5, 0.0001)
+function TestExponent:testIsRightAssociative()
+    luaunit.assertEquals(parse("2^3^2"), 512)
 end
 
-function testNegativeNumbers()
-    luaunit.assertEquals(Calculator.parseExpression("-5+3"), -2)
+function TestExponent:testDoubleStarWithNegativeExponent()
+    luaunit.assertEquals(parse("2**-3"), 0.125)
 end
 
-function testDoubleStarExponentAlias()
-    luaunit.assertEquals(Calculator.parseExpression("2**3"), 8)
+function TestExponent:testWithNegativeOperand()
+    luaunit.assertEquals(parse("2^-2"), 0.25)
 end
 
-function testDoubleStarWithNegativeExponent()
-    luaunit.assertEquals(Calculator.parseExpression("2**-3"), 0.125)
+function TestExponent:testFactorialWithDoubleStarAlias()
+    luaunit.assertEquals(parse("3!**2"), 36)
 end
 
-function testExponentIsRightAssociative()
-    luaunit.assertEquals(Calculator.parseExpression("2^3^2"), 512)
+-- Factorial
+TestFactorial = {}
+
+function TestFactorial:testFactorial()
+    luaunit.assertEquals(parse("5!"), 120)
 end
 
-function testFactorialWithDoubleStarAlias()
-    luaunit.assertEquals(Calculator.parseExpression("3!**2"), 36)
+function TestFactorial:testFactorialOfZero()
+    luaunit.assertEquals(parse("0!"), 1)
 end
 
-function testWhitespaceEverywhere()
-    luaunit.assertEquals(Calculator.parseExpression("  2 + 3 * ( 4 - 1 )  "), 11)
+function TestFactorial:testFactorialOfOne()
+    luaunit.assertEquals(parse("1!"), 1)
 end
 
-function testWhitespaceAroundUnaryMinus()
-    luaunit.assertEquals(Calculator.parseExpression("- 5 + 3"), -2)
+function TestFactorial:testFactorialAfterParens()
+    luaunit.assertEquals(parse("(3+2)!"), 120)
 end
 
-function testLeadingDecimalPoint()
-    luaunit.assertEquals(Calculator.parseExpression(".5+.5"), 1)
+function TestFactorial:testNestedFactorialAndExponent()
+    luaunit.assertEquals(parse("3!^2"), 36)
 end
 
-function testTrailingDecimalPoint()
-    luaunit.assertEquals(Calculator.parseExpression("5.+2"), 7)
+-- Unary plus and minus
+TestUnaryOperators = {}
+
+function TestUnaryOperators:testNegativeNumbers()
+    luaunit.assertEquals(parse("-5+3"), -2)
 end
 
-function testMalformedNumberMultipleDotsThrows()
-    luaunit.assertError(Calculator.parseExpression, "1.2.3")
+function TestUnaryOperators:testDoubleUnaryMinus()
+    luaunit.assertEquals(parse("--5"), 5)
 end
 
-function testFactorialOfZero()
-    luaunit.assertEquals(Calculator.parseExpression("0!"), 1)
+function TestUnaryOperators:testUnaryMinusOnFactorial()
+    luaunit.assertEquals(parse("-3!"), -6)
 end
 
-function testFactorialOfOne()
-    luaunit.assertEquals(Calculator.parseExpression("1!"), 1)
+function TestUnaryOperators:testChainedUnaryMinusWithFactorial()
+    luaunit.assertEquals(parse("--3!"), 6)
 end
 
-function testFactorialAfterParens()
-    luaunit.assertEquals(Calculator.parseExpression("(3+2)!"), 120)
+function TestUnaryOperators:testUnaryMinusBeforeExponent()
+    luaunit.assertEquals(parse("-2^2"), -4)
 end
 
-function testDoubleFactorialThrows()
-    luaunit.assertError(Calculator.parseExpression, "3!!")
+function TestUnaryOperators:testUnaryMinusOnParenExpression()
+    luaunit.assertEquals(parse("-(2+3)"), -5)
 end
 
-function testChainedUnaryMinusWithFactorial()
-    luaunit.assertEquals(Calculator.parseExpression("--3!"), 6)
+function TestUnaryOperators:testParenNegativeThenExponent()
+    luaunit.assertEquals(parse("(-2)^2"), 4)
 end
 
-function testNegativeModulo()
-    luaunit.assertEquals(Calculator.parseExpression("-10%3"), 2)
+function TestUnaryOperators:testUnaryMinusMultiplication()
+    luaunit.assertEquals(parse("-2*-3"), 6)
 end
 
-function testModuloWithFloatOperand()
-    luaunit.assertAlmostEquals(Calculator.parseExpression("10.5%3"), 1.5, 0.0001)
+function TestUnaryOperators:testUnaryMinusAtStartOfParenGroup()
+    luaunit.assertEquals(parse("3*(-2+1)"), -3)
 end
 
-function testUnaryPlus()
-    luaunit.assertEquals(Calculator.parseExpression("+3"), 3)
+function TestUnaryOperators:testUnaryPlus()
+    luaunit.assertEquals(parse("+3"), 3)
 end
 
-function testUnaryPlusBeforeExponent()
-    luaunit.assertEquals(Calculator.parseExpression("+2^2"), 4)
+function TestUnaryOperators:testUnaryPlusBeforeExponent()
+    luaunit.assertEquals(parse("+2^2"), 4)
 end
 
-function testUnaryPlusOnFactorial()
-    luaunit.assertEquals(Calculator.parseExpression("+3!"), 6)
+function TestUnaryOperators:testUnaryPlusOnFactorial()
+    luaunit.assertEquals(parse("+3!"), 6)
 end
 
-function testDoubleUnaryPlus()
-    luaunit.assertEquals(Calculator.parseExpression("++5"), 5)
+function TestUnaryOperators:testDoubleUnaryPlus()
+    luaunit.assertEquals(parse("++5"), 5)
 end
 
-function testMixedUnaryPlusMinus()
-    luaunit.assertEquals(Calculator.parseExpression("+-5"), -5)
+function TestUnaryOperators:testMixedUnaryPlusMinus()
+    luaunit.assertEquals(parse("+-5"), -5)
 end
 
-function testMixedUnaryMinusPlus()
-    luaunit.assertEquals(Calculator.parseExpression("-+5"), -5)
+function TestUnaryOperators:testMixedUnaryMinusPlus()
+    luaunit.assertEquals(parse("-+5"), -5)
 end
 
-function testUnaryPlusWithSpaces()
-    luaunit.assertEquals(Calculator.parseExpression("+ 5 + 3"), 8)
+-- Precedence and parentheses grouping
+TestPrecedenceAndParens = {}
+
+function TestPrecedenceAndParens:testOperatorPrecedence()
+    luaunit.assertEquals(parse("2+3*4"), 14)
 end
 
--- Errors
-
-function testDivisionByZeroThrows()
-    luaunit.assertError(Calculator.parseExpression, "5/0")
+function TestPrecedenceAndParens:testParentheses()
+    luaunit.assertEquals(parse("(2+3)*4"), 20)
 end
 
-function testMalformedExpressionThrows()
-    luaunit.assertError(Calculator.parseExpression, "2++")
+function TestPrecedenceAndParens:testNestedParens()
+    luaunit.assertEquals(parse("((2+3)*(4-1))"), 15)
 end
 
-function testEmptyStringThrows()
-    luaunit.assertError(Calculator.parseExpression, "")
+-- Number literals
+TestNumberLiterals = {}
+
+function TestNumberLiterals:testLeadingDecimalPoint()
+    luaunit.assertEquals(parse(".5+.5"), 1)
 end
 
-function testFactorialOfNegativeThrows()
-    luaunit.assertError(Calculator.parseExpression, "(-3)!")
+function TestNumberLiterals:testTrailingDecimalPoint()
+    luaunit.assertEquals(parse("5.+2"), 7)
 end
 
-function testFactorialOfNonIntegerThrows()
-    luaunit.assertError(Calculator.parseExpression, "2.5!")
+-- Whitespace
+TestWhitespace = {}
+
+function TestWhitespace:testWhitespaceEverywhere()
+    luaunit.assertEquals(parse("  2 + 3 * ( 4 - 1 )  "), 11)
 end
 
-function testUnmatchedParenThrows()
-    luaunit.assertError(Calculator.parseExpression, "(2+3")
+function TestWhitespace:testWhitespaceAroundUnaryMinus()
+    luaunit.assertEquals(parse("- 5 + 3"), -2)
 end
 
-function testInvalidCharacterThrows()
-    luaunit.assertError(Calculator.parseExpression, "2+a")
+function TestWhitespace:testUnaryPlusWithSpaces()
+    luaunit.assertEquals(parse("+ 5 + 3"), 8)
 end
 
-function testUnaryMinusBeforeExponent()
-    luaunit.assertEquals(Calculator.parseExpression("-2^2"), -4)
+-- Malformed input and errors
+TestErrors = {}
+
+function TestErrors:testDivisionByZero()
+    luaunit.assertError(parse, "5/0")
 end
 
-function testUnaryMinusOnParenExpression()
-    luaunit.assertEquals(Calculator.parseExpression("-(2+3)"), -5)
+function TestErrors:testModuloDivisionByZero()
+    luaunit.assertError(parse, "5/0")
 end
 
-function testParenNegativeThenExponent()
-    luaunit.assertEquals(Calculator.parseExpression("(-2)^2"), 4)
+function TestErrors:testMalformedExpression()
+    luaunit.assertError(parse, "2++")
 end
 
-function testExponentWithNegativeOperand()
-    luaunit.assertEquals(Calculator.parseExpression("2^-2"), 0.25)
+function TestErrors:testEmptyString()
+    luaunit.assertError(parse, "")
 end
 
-function testDoubleUnaryMinus()
-    luaunit.assertEquals(Calculator.parseExpression("--5"), 5)
+function TestErrors:testFactorialOfNegative()
+    luaunit.assertError(parse, "(-3)!")
 end
 
-function testUnaryMinusOnFactorial()
-    luaunit.assertEquals(Calculator.parseExpression("-3!"), -6)
+function TestErrors:testFactorialOfNonInteger()
+    luaunit.assertError(parse, "2.5!")
 end
 
-function testUnaryMinusInsideParenWithFactorial()
-    luaunit.assertError(Calculator.parseExpression, "(-3)!")
+function TestErrors:testDoubleFactorial()
+    luaunit.assertError(parse, "3!!")
 end
 
-function testNestedParens()
-    luaunit.assertEquals(Calculator.parseExpression("((2+3)*(4-1))"), 15)
+function TestErrors:testMalformedNumberMultipleDots()
+    luaunit.assertError(parse, "1.2.3")
 end
 
-function testUnaryMinusAtStartOfParenGroup()
-    luaunit.assertEquals(Calculator.parseExpression("3*(-2+1)"), -3)
+function TestErrors:testUnmatchedOpeningParen()
+    luaunit.assertError(parse, "(2+3")
 end
 
-function testUnaryMinusMultiplication()
-    luaunit.assertEquals(Calculator.parseExpression("-2*-3"), 6)
+function TestErrors:testMismatchedClosingParen()
+    luaunit.assertError(parse, "2+3)")
 end
 
-function testEmptyParensThrows()
-    luaunit.assertError(Calculator.parseExpression, "()")
+function TestErrors:testEmptyParens()
+    luaunit.assertError(parse, "()")
 end
 
-function testMismatchedClosingParenThrows()
-    luaunit.assertError(Calculator.parseExpression, "2+3)")
+function TestErrors:testInvalidCharacter()
+    luaunit.assertError(parse, "2+a")
 end
 
-function testParenWithNoOperatorThrows()
-    luaunit.assertError(Calculator.parseExpression, "2(3+1)")
+function TestErrors:testParenWithNoOperator()
+    luaunit.assertError(parse, "2(3+1)")
 end
 
-function testImplicitConcatenationThrows()
-    luaunit.assertError(Calculator.parseExpression, "2 3")
+function TestErrors:testImplicitConcatenation()
+    luaunit.assertError(parse, "2 3")
 end
 
 os.exit(luaunit.LuaUnit.run())
