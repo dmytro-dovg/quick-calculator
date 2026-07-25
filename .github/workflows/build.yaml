@@ -47,7 +47,6 @@ jobs:
         shell: bash
         run: |
           ./tools/test tests
-          [[ $? != 0 ]] && exit 1
 
       - name: Package archive
         id: package-archive
