@@ -1,16 +1,16 @@
 
 local C = require "constants"
-local Util = {}
+local Utility = {}
 
-function Util.d(msg)
+function Utility.d(msg)
     if not C.debug.logging_enabled then return end
     local message = "[quick-calculator]: " .. msg
     localised_print(message)
 end
 
----@param err table|string error raised by Calculator.parseExpression
+---@param err table | string error raised by Calculator.parseExpression
 ---@return LocalisedString
-function Util.localise_parse_error(err)
+function Utility.localise_parse_error(err)
     if type(err) ~= "table" or not err.code then
         return { "quick-calculator-error.unexpected", tostring(err) }
     end
@@ -22,4 +22,4 @@ function Util.localise_parse_error(err)
     end
     return { "quick-calculator-error.parse-error", err.position, detail }
 end
-return Util
+return Utility
