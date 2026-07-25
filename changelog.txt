@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------------------------------
+Version: 2.0.0
+Date: 2026-07-25
+  Features:
+    - Added Calculator pop-up window.
+    - Ctrl + Alt + C - default keybind to open the calculator. Esc or Enter to close.
+    - Supported operation: +, -, *, /, %, ^, (), !, sqrt, abs, exp, ln, log, sin, cos, tan, asin, acos, atan, floor, ceil.
+    - Supported constants: pi, e.
+  Locale:
+    - Added English.
+    - Added Ukrainian.
