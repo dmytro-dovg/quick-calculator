@@ -27,3 +27,5 @@ examples
 examples/*
 tests
 tests/*
+.lua
+.lua/*
