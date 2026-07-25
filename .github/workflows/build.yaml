@@ -2,10 +2,8 @@ name: Package Blueprint Share
 on:
   push:
     branches:
-      - main
       - develop
       - release/*
-      - feature/ci
     tags:
       - '*'
 
