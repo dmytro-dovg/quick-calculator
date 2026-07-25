@@ -16,6 +16,7 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v6
       - uses: leafo/gh-actions-lua@v13
+        if: ${{ github.server_url == 'https://github.com' }}
         with:
           luaVersion: "5.2.4"
       - name: Read version from info.json
