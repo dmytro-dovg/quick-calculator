@@ -9,5 +9,6 @@ C.gui = {
     result_textfield = C.mod_name .. "-result-textfield",
     cross_button = C.mod_name .. "-cross-button",
 }
+C.toggle_shortcut = "quick-calculator-toggle"
 
 return C

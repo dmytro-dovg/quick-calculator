@@ -164,6 +164,7 @@ local function show(player_index)
 
         input_textfield.focus()
         player.opened = frame
+        player.set_shortcut_toggled(C.toggle_shortcut, true)
     end
 end
 
@@ -173,11 +174,16 @@ local function hide(player_index)
     if frame then
         frame.destroy()
         storage.players[player_index].gui = { }
+        local player = game.get_player(player_index)
+        if player then
+            player.set_shortcut_toggled(C.toggle_shortcut, false)
+        end
     end
 end
 
----@param player_index integer
+---@param player_index integer?
 local function toggle(player_index)
+    if not player_index or player_index < 1 then return end
     if storage.players[player_index].gui.claculator_frame then
         hide(player_index)
     else
@@ -187,23 +193,26 @@ end
 
 ---@param player_index integer
 local function init_player(player_index)
+    storage.players = storage.players or { }
+    if storage.players[player_index] then return end
     storage.players[player_index] = {
         gui = { }
     }
 end
 
 commands.add_command("qcalc", nil, function (cmd)
-    local player_index = cmd.player_index
-    if not player_index or player_index < 1 then return end
-    toggle(player_index)
+    toggle(cmd.player_index)
 end)
 
 script.on_event("quick-calculator-toggle", function(event)
     ---@diagnostic disable: undefined-field
-    local player_index = event.player_index
+    toggle(event.player_index)
     ---@diagnostic enable: undefined-field
-    if not player_index or player_index < 1 then return end
-    toggle(player_index)
+end)
+
+script.on_event(defines.events.on_lua_shortcut, function(event)
+    if event.prototype_name ~= C.toggle_shortcut then return end
+    toggle(event.player_index)
 end)
 
 script.on_event(defines.events.on_gui_text_changed, function (event)
@@ -259,11 +268,17 @@ script.on_event(defines.events.on_gui_confirmed, function (event)
 end)
 
 script.on_init(function()
-    storage.players = { }
+    for _, player in pairs(game.connected_players) do
+        init_player(player.index)
+    end
 end)
 
 script.on_event(defines.events.on_player_joined_game, function(event)
     init_player(event.player_index)
+end)
+
+script.on_event(defines.events.on_player_left_game, function(event)
+    storage.players[event.player_index] = nil
 end)
 
 script.on_configuration_changed(function(event)

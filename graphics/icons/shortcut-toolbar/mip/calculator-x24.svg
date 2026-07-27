@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="24"
+   height="24"
+   viewBox="0 0 6.3499999 6.35"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
+   sodipodi:docname="calculator-x24.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="true"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     inkscape:zoom="17.23266"
+     inkscape:cx="-7.6888884"
+     inkscape:cy="3.6848635"
+     inkscape:window-width="2560"
+     inkscape:window-height="1412"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-0.1756974,0.11582041)">
+    <text
+       xml:space="preserve"
+       style="font-weight:800;font-size:4.23333px;line-height:1;font-family:'Alegreya Sans SC';-inkscape-font-specification:'Alegreya Sans SC Ultra-Bold';text-align:start;letter-spacing:0.132292px;word-spacing:0px;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#1b1b1b;fill-opacity:1;stroke-width:0.529167;stroke-linecap:square;stroke-miterlimit:2;paint-order:markers fill stroke"
+       x="0.35179335"
+       y="2.6228962"
+       id="text1"
+       inkscape:label="add"><tspan
+         sodipodi:role="line"
+         id="tspan1"
+         style="font-style:normal;font-variant:normal;font-weight:900;font-stretch:normal;font-size:4.23333px;font-family:Jost;-inkscape-font-specification:'Jost Heavy';fill:#1b1b1b;fill-opacity:1;stroke-width:0.529167"
+         x="0.35179335"
+         y="2.6228962">+</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;font-size:4.23333px;line-height:1;font-family:Jost;-inkscape-font-specification:'Jost Semi-Bold';text-align:start;letter-spacing:0.132292px;word-spacing:0px;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#1b1b1b;fill-opacity:1;stroke-width:0.529167;stroke-linecap:square;stroke-miterlimit:2;paint-order:markers fill stroke"
+       x="3.5824471"
+       y="5.9953642"
+       id="text2"
+       inkscape:label="div"><tspan
+         sodipodi:role="line"
+         id="tspan2"
+         style="font-style:normal;font-variant:normal;font-weight:900;font-stretch:normal;font-size:4.23333px;font-family:Jost;-inkscape-font-specification:'Jost Heavy';fill:#1b1b1b;fill-opacity:1;stroke-width:0.529167"
+         x="3.5824471"
+         y="5.9953642">÷</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;font-size:4.23333px;line-height:1;font-family:Jost;-inkscape-font-specification:'Jost Semi-Bold';text-align:start;letter-spacing:0.132292px;word-spacing:0px;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#1b1b1b;fill-opacity:1;stroke-width:0.529167;stroke-linecap:square;stroke-miterlimit:2;paint-order:markers fill stroke"
+       x="3.6988635"
+       y="2.453563"
+       id="text3"
+       inkscape:label="minus"><tspan
+         sodipodi:role="line"
+         id="tspan3"
+         style="font-style:normal;font-variant:normal;font-weight:900;font-stretch:normal;font-size:4.23333px;font-family:Jost;-inkscape-font-specification:'Jost Heavy';fill:#1b1b1b;fill-opacity:1;stroke-width:0.529167"
+         x="3.6988635"
+         y="2.453563">−</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;font-size:4.23333px;line-height:1;font-family:Jost;-inkscape-font-specification:'Jost Semi-Bold';text-align:start;letter-spacing:0.132292px;word-spacing:0px;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#1b1b1b;fill-opacity:1;stroke-width:0.529167;stroke-linecap:square;stroke-miterlimit:2;paint-order:markers fill stroke"
+       x="0.59309316"
+       y="5.5296979"
+       id="text4"
+       inkscape:label="mult"><tspan
+         sodipodi:role="line"
+         id="tspan4"
+         style="font-style:normal;font-variant:normal;font-weight:900;font-stretch:normal;font-size:4.23333px;font-family:Jost;-inkscape-font-specification:'Jost Heavy';fill:#1b1b1b;fill-opacity:1;stroke-width:0.529167"
+         x="0.59309316"
+         y="5.5296979">×</tspan></text>
+  </g>
+</svg>
