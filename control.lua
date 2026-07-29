@@ -283,6 +283,7 @@ end)
 
 script.on_configuration_changed(function(event)
     -- Close all open windows
+    if not storage.players then return end
     for _, state in pairs(storage.players) do
         local frame = state.gui.claculator_frame
         if frame then frame.destroy() end
