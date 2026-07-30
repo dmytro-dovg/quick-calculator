@@ -19,9 +19,31 @@ local Calculator = require "calculator"
 ---@type ModStorage
 storage = storage
 
+---Determine if an element is a descendant of another element
+---@param element LuaGuiElement
+---@param ancestor LuaGuiElement
+---@return boolean
+local function is_descendant(element, ancestor)
+    local current_parent = element.parent
+    while current_parent ~= nil do
+        if current_parent == ancestor then return true end
+        current_parent = current_parent.parent
+    end
+    return false
+end
+
+---@param player_index integer
+---@return GuiState?
+local function player_gui_state(player_index)
+    local state = storage.players[player_index]
+    return state and state.gui
+end
+
 ---@param player_index integer
 local function show(player_index)
-    local frame = storage.players[player_index].gui.calculator_frame
+    local gui_state = player_gui_state(player_index)
+    if not gui_state then return end
+    local frame = gui_state.calculator_frame
     if not frame then
         local player = game.get_player(player_index)
         if not player then return end
@@ -101,12 +123,11 @@ local function show(player_index)
             type = "textfield",
             style = "quick-calculator_result-textfield",
             name = C.gui.result_textfield,
-            enabled = false,
-            lose_focus_on_confirm = true,
         }
-
+        result_textfield.read_only = true
+        result_textfield.selectable = true
         result_textfield.style.horizontal_align = "left"
-        result_textfield.style.disabled_font_color = { 0.8, 0.8, 0.8 }
+        result_textfield.style.font_color = { 0.8, 0.8, 0.8 }
         result_textfield.style.font = "default-large-semibold"
         result_textfield.style.horizontally_stretchable = true
         result_textfield.style.maximal_width = 0
@@ -155,12 +176,12 @@ local function show(player_index)
 
         content.drag_target = frame
 
-        storage.players[player_index].gui.calculator_frame = frame
-        storage.players[player_index].gui.input_frame = input_frame
-        storage.players[player_index].gui.input_textfield = input_textfield
-        storage.players[player_index].gui.result_textfield = result_textfield
-        storage.players[player_index].gui.cross_button = cross_button
-        storage.players[player_index].gui.warning_icon = warning_icon
+        gui_state.calculator_frame = frame
+        gui_state.input_frame = input_frame
+        gui_state.input_textfield = input_textfield
+        gui_state.result_textfield = result_textfield
+        gui_state.cross_button = cross_button
+        gui_state.warning_icon = warning_icon
 
         input_textfield.focus()
         player.opened = frame
@@ -170,7 +191,9 @@ end
 
 ---@param player_index integer
 local function hide(player_index)
-    local frame = storage.players[player_index].gui.calculator_frame
+    local gui_state = player_gui_state(player_index)
+    if not gui_state then return end
+    local frame = gui_state.calculator_frame
     if frame then
         frame.destroy()
         storage.players[player_index].gui = { }
@@ -184,7 +207,8 @@ end
 ---@param player_index integer?
 local function toggle(player_index)
     if not player_index or player_index < 1 then return end
-    if storage.players[player_index].gui.calculator_frame then
+    local gui_state = player_gui_state(player_index)
+    if gui_state and gui_state.calculator_frame then
         hide(player_index)
     else
         show(player_index)
@@ -217,18 +241,22 @@ end)
 
 script.on_event(defines.events.on_gui_text_changed, function (event)
     if event.element.name ~= C.gui.input_textfield then return end
-    local result_textfield = storage.players[event.player_index].gui.result_textfield
+
+    local gui_state = player_gui_state(event.player_index)
+    if not gui_state then return end
+
+    local result_textfield = gui_state.result_textfield
     if not result_textfield then return end
 
     local text = event.text
     if text:len() == 0 then
         result_textfield.text = ""
-        storage.players[event.player_index].gui.warning_icon.visible = false
+        gui_state.warning_icon.visible = false
         return
     end
 
     local success, result = pcall(Calculator.parseExpression, text)
-    local warning_icon = storage.players[event.player_index].gui.warning_icon
+    local warning_icon = gui_state.warning_icon
     if success and result then
         Utility.d("Result: "  .. result)
         warning_icon.visible = false
@@ -243,10 +271,24 @@ script.on_event(defines.events.on_gui_text_changed, function (event)
 end)
 
 script.on_event(defines.events.on_gui_click, function(event)
-    if event.element.name ~= C.gui.cross_button then return end
-    local input_textfield = storage.players[event.player_index].gui.input_textfield
-    local result_textfield = storage.players[event.player_index].gui.result_textfield
-    local warning_icon = storage.players[event.player_index].gui.warning_icon
+    local gui_state = player_gui_state(event.player_index)
+    if not gui_state then return end
+
+    local main_frame = gui_state.calculator_frame
+    if not main_frame then return end
+
+    local input_textfield = gui_state.input_textfield
+    local result_textfield = gui_state.result_textfield
+    local cross_button = gui_state.cross_button
+
+    -- Refocus on input textfield
+    if is_descendant(event.element, main_frame) and input_textfield and result_textfield and event.element ~= result_textfield then
+        input_textfield.focus()
+    end
+
+    -- Clear button
+    if event.element ~= cross_button then return end
+    local warning_icon = gui_state.warning_icon
     if input_textfield then
         input_textfield.text = ""
         if warning_icon then warning_icon.visible = false end
@@ -278,6 +320,7 @@ script.on_event(defines.events.on_player_joined_game, function(event)
 end)
 
 script.on_event(defines.events.on_player_left_game, function(event)
+    hide(event.player_index)
     storage.players[event.player_index] = nil
 end)
 
