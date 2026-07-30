@@ -226,6 +226,22 @@ function TestFunctions:testLnOfE()
     luaunit.assertAlmostEquals(parse("ln(e)"), 1, 0.0001)
 end
 
+function TestFunctions:testRadOf180()
+    luaunit.assertAlmostEquals(parse("rad(180)"), math.pi, 0.0001)
+end
+
+function TestFunctions:testDegOfPi()
+    luaunit.assertAlmostEquals(parse("deg(pi)"), 180, 0.0001)
+end
+
+function TestFunctions:testRadDegRoundTrip()
+    luaunit.assertAlmostEquals(parse("deg(rad(90))"), 90, 0.0001)
+end
+
+function TestFunctions:testSinOfRad90()
+    luaunit.assertAlmostEquals(parse("sin(rad(90))"), 1, 0.0001)
+end
+
 function TestFunctions:testFunctionArgumentIsExpression()
     luaunit.assertEquals(parse("sqrt(2+7*2)"), 4)
 end
