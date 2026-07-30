@@ -1,6 +1,6 @@
 local C = {}
 C.debug = {
-    logging_enabled = true,
+    logging_enabled = false,
 }
 C.mod_name = "quick-calculator"
 C.gui = {
