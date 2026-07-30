@@ -14,6 +14,8 @@ local functions = {
     atan = math.atan,
     floor = math.floor,
     ceil = math.ceil,
+    rad = math.rad,
+    deg = math.deg,
 }
 
 local constants = {
@@ -45,8 +47,8 @@ local Error = Calculator.Error
 ---   * Exponent:     ^ or **
 ---   * Factorial:    x! (single "!" only)
 ---   * Grouping:     ( )
----   * Functions:    sqrt, abs, exp, ln, log, sin, cos, tan,
----                   asin, acos, atan, floor, ceil (trig in radians)
+---   * Functions:    sqrt, abs, exp, ln, log, sin, cos, tan, asin, acos,
+---                   atan, floor, ceil, rad, deg (trig in radians)
 ---   * Constants:    pi, e
 ---@param expression string
 ---@return number?

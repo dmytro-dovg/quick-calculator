@@ -3,6 +3,7 @@ Version: 2.1.3
 Date: 2026-xx-xx
   Features:
     - The /qcalc command now evaluates an expression passed as an argument and prints the result to the console (e.g. /qcalc 3 + 12/4).
+    - Added rad and deg functions to convert between degrees and radians.
 ---------------------------------------------------------------------------------------------------
 Version: 2.1.2
 Date: 2026-07-30
