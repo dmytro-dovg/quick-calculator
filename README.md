@@ -8,12 +8,13 @@ A pop-up calculator for Factorio. Do quick math without leaving the game.
 
 ## Usage
 
-Open/close the calculator with:
+Press `Ctrl + Alt + C` or run `/qcalc` to open the calculator. As you type an expression, the result updates live. Press `Enter` or `Escape` to close the window.
 
-- Hotkey: `Ctrl + Alt + C`
-- Console command: `/qcalc`
+To evaluate an expression without opening the window, pass it to `/qcalc` directly and the result will be printed on the screen:
 
-Type an expression in the input field; the result updates as you type. Press `Enter` or `Escape` to close.
+```
+/qcalc 3 + 12/4
+```
 
 ## Supported syntax
 
