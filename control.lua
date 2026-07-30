@@ -3,7 +3,7 @@ local Utility = require "utility"
 local Calculator = require "calculator"
 
 ---@class GuiState
----@field claculator_frame LuaGuiElement?
+---@field calculator_frame LuaGuiElement?
 ---@field input_frame LuaGuiElement?
 ---@field input_textfield LuaGuiElement?
 ---@field result_textfield LuaGuiElement?
@@ -21,7 +21,7 @@ storage = storage
 
 ---@param player_index integer
 local function show(player_index)
-    local frame = storage.players[player_index].gui.claculator_frame
+    local frame = storage.players[player_index].gui.calculator_frame
     if not frame then
         local player = game.get_player(player_index)
         if not player then return end
@@ -155,7 +155,7 @@ local function show(player_index)
 
         content.drag_target = frame
 
-        storage.players[player_index].gui.claculator_frame = frame
+        storage.players[player_index].gui.calculator_frame = frame
         storage.players[player_index].gui.input_frame = input_frame
         storage.players[player_index].gui.input_textfield = input_textfield
         storage.players[player_index].gui.result_textfield = result_textfield
@@ -170,7 +170,7 @@ end
 
 ---@param player_index integer
 local function hide(player_index)
-    local frame = storage.players[player_index].gui.claculator_frame
+    local frame = storage.players[player_index].gui.calculator_frame
     if frame then
         frame.destroy()
         storage.players[player_index].gui = { }
@@ -184,7 +184,7 @@ end
 ---@param player_index integer?
 local function toggle(player_index)
     if not player_index or player_index < 1 then return end
-    if storage.players[player_index].gui.claculator_frame then
+    if storage.players[player_index].gui.calculator_frame then
         hide(player_index)
     else
         show(player_index)
@@ -285,7 +285,7 @@ script.on_configuration_changed(function(event)
     -- Close all open windows
     if not storage.players then return end
     for _, state in pairs(storage.players) do
-        local frame = state.gui.claculator_frame
+        local frame = state.gui.calculator_frame
         if frame then frame.destroy() end
         state.gui = { }
     end
