@@ -224,8 +224,42 @@ local function init_player(player_index)
     }
 end
 
-commands.add_command("qcalc", nil, function (cmd)
-    toggle(cmd.player_index)
+---@param is_error boolean?
+---@return PrintSettings
+local function command_print_settings(is_error)
+    is_error = is_error or false
+    return {
+        game_state = false,
+        sound = is_error and defines.print_sound.use_player_settings or defines.print_sound.never,
+        color = is_error and { 0.9, 0.35, 0.0, } or { 1.0, 1.0, 1.0, },
+    }
+end
+
+---@param command CustomCommandData
+local function process_calculate_command(command)
+    local player_index = command.player_index
+    if not player_index then return end
+    local player = game.get_player(player_index)
+    if player and command.parameter then
+        local success, result = pcall(Calculator.parseExpression, command.parameter)
+        if success and result then
+            player.print(command.parameter .. " = " .. result, command_print_settings())
+        else
+            if type(result) == "table" then
+                player.print(Utility.localise_parse_error(result), command_print_settings(true))
+            end
+        end
+        return
+    end
+
+    -- Only show GUI to players
+    if player_index > 0 then
+        toggle(command.player_index)
+    end
+end
+
+commands.add_command("qcalc", { "command-help.qcalc", "qcalc" }, function (command)
+    process_calculate_command(command)
 end)
 
 script.on_event("quick-calculator-toggle", function(event)
