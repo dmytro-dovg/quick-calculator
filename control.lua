@@ -120,7 +120,7 @@ local function show(player_index)
         result_label.style.bottom_padding = 4
 
         local result_textfield = section_2.add {
-            type = "textfield",
+            type = "text-box",
             style = "quick-calculator_result-textfield",
             name = C.gui.result_textfield,
         }
