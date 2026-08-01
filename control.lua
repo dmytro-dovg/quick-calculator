@@ -92,7 +92,7 @@ local function show(player_index)
             type = "sprite-button",
             name = C.gui.cross_button,
             style = "frame_action_button",
-            sprite = "utility/close",
+            sprite = "quick-calculator_tag-cross",
             tooltip = { "gui-quick-calculator.clear-tooltip" },
             resize_to_sprite = false,
         }
