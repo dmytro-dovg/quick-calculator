@@ -4,7 +4,7 @@
 
 A pop-up calculator for Factorio. Do quick math without leaving the game.
 
-![Demo](docs/demo1.gif)
+![Demo](docs/demo2.gif)
 
 ## Usage
 
