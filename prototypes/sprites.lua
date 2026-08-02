@@ -10,6 +10,16 @@ local info = {
     flags = {"gui-icon"},
 }
 
+local warn = {
+    type = "sprite",
+    name = "quick-calculator_warn",
+    filename = "__quick-calculator__/graphics/icons/warn.png",
+    size = 32,
+    scale = 0.5,
+    mipmap_count = 3,
+    flags = {"gui-icon"},
+}
+
 local tag_cross = {
     type = "sprite",
     name = "quick-calculator_tag-cross",
@@ -20,4 +30,4 @@ local tag_cross = {
     flags = {"gui-icon"},
 }
 
-data:extend({ info, tag_cross, })
+data:extend({ info, warn, tag_cross, })

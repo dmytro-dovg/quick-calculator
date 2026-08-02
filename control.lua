@@ -136,7 +136,7 @@ local function show(player_index)
         icons.style.vertical_align = "center"
         local warning_icon = icons.add {
             type = "sprite",
-            sprite = "utility/warning_white",
+            sprite = "quick-calculator_warn",
             visible = false,
         }
         local info_icon = icons.add {
