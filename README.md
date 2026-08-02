@@ -2,8 +2,6 @@
 ![Lastest Version](https://img.shields.io/factorio-mod-portal/v/quick-calculator) ![Last Updated](https://img.shields.io/factorio-mod-portal/last-updated/quick-calculator) ![Downloads](https://img.shields.io/factorio-mod-portal/dt/quick-calculator)
 ![Downloads](https://img.shields.io/github/license/dmytro-dovg/quick-calculator)
 
-![Thumbnail](thumbnail.png)
-
 # Quick Calculator
 
 A pop-up calculator for Factorio. Do quick math without leaving the game.
