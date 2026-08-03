@@ -82,9 +82,17 @@ function Calculator.parseExpression(expression)
     local function consumeNumber()
         skip_spaces()
         local start = cursor
-        while expression:sub(cursor, cursor):match("[%d%.]") do advance() end
+        while expression:sub(cursor, cursor):match("[%d%.eE]") do advance() end
         if cursor == start then
             fail(Error.EXPECTED_NUMBER)
+        end
+        -- Handle scientific notation
+        if expression:sub(cursor - 1, cursor - 1):lower() == 'e' then
+            if next_character():match("[+-]") then
+                advance()
+                -- Decimal point will be caught by INVALID_NUMBER error
+                while expression:sub(cursor, cursor):match("[%d%.]") do advance() end
+            end
         end
         local num = tonumber(expression:sub(start, cursor - 1))
         if not num then
@@ -242,7 +250,7 @@ function Calculator.parseExpression(expression)
     local result = parse()
     skip_spaces()
     if cursor <= expression:len() then
-        fail(Error.UNEXPECTED_TRAILING_INPUT)
+        fail(Error.UNEXPECTED_TRAILING_INPUT, expression:sub(cursor, expression:len()))
     end
     return result
 end

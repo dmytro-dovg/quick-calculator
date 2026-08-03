@@ -180,6 +180,30 @@ function TestNumberLiterals:testTrailingDecimalPoint()
     luaunit.assertEquals(parse("5.+2"), 7)
 end
 
+function TestNumberLiterals:testScientificLower()
+    luaunit.assertEquals(parse("2e+2+2"), 202)
+end
+
+function TestNumberLiterals:testScientificUpper()
+    luaunit.assertEquals(parse("2E+2+2"), 202)
+end
+
+function TestNumberLiterals:testScientificDecimal()
+    luaunit.assertEquals(parse("2.1e2+2"), 212, 0.0001)
+end
+
+function TestNumberLiterals:testScientificPositive()
+    luaunit.assertEquals(parse("2e+2+2"), 202)
+end
+
+function TestNumberLiterals:testScientificNegative()
+    luaunit.assertAlmostEquals(parse("2e-2+2"), 2.02)
+end
+
+function TestNumberLiterals:testScientificImplicit()
+    luaunit.assertEquals(parse("2e2+2"), 202)
+end
+
 -- Whitespace
 TestWhitespace = {}
 
