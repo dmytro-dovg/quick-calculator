@@ -2,7 +2,10 @@
 Version: 2.1.7
 Date: 2026-xx-xx
   Features:
-    - Added support for scientific E notation. e.g. 2e+2 (200), 2e-2 (0.02)
+    - Added support for scientific E notation. e.g. 2e+2, 2e-2, etc.
+    - Added SI suffix support. e.g. 1k, 1M, etc.
+  Bugfixes:
+    - Factorial is limited to 170. Computing factorial of a large number could make the game freeze.
 ---------------------------------------------------------------------------------------------------
 Version: 2.1.6
 Date: 2026-08-02
