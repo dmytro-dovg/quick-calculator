@@ -6,6 +6,7 @@ local functions = {
     exp = math.exp,
     ln = math.log,
     log = function(x) return math.log(x, 10) end,
+    log2 = function(x) return math.log(x, 2) end,
     sin = math.sin,
     cos = math.cos,
     tan = math.tan,
@@ -14,6 +15,9 @@ local functions = {
     atan = math.atan,
     floor = math.floor,
     ceil = math.ceil,
+    round = function(x) return x >= 0 and math.floor(x + 0.5) or math.ceil(x - 0.5) end,
+    trunc = function(x) return (math.modf(x)) end,
+    sign = function(x) return x > 0 and 1 or (x < 0 and -1 or 0) end,
     rad = math.rad,
     deg = math.deg,
 }
@@ -57,16 +61,6 @@ Calculator.Error = {
 local Error = Calculator.Error
 
 --- Parse and evaluate an arithmetic expression string.
----
---- Supported syntax:
----   * Arithmetic:   + - * / %
----   * Unary signs:  -x, +x
----   * Exponent:     ^ or **
----   * Factorial:    x! (single "!" only)
----   * Grouping:     ( )
----   * Functions:    sqrt, abs, exp, ln, log, sin, cos, tan, asin, acos,
----                   atan, floor, ceil, rad, deg (trig in radians)
----   * Constants:    pi, e
 ---@param expression string
 ---@return number?
 function Calculator.parseExpression(expression)
@@ -121,7 +115,7 @@ function Calculator.parseExpression(expression)
     local function consumeIdentifier()
         skip_spaces()
         local start = cursor
-        while expression:sub(cursor, cursor):match("%a") do advance() end
+        while expression:sub(cursor, cursor):match("%w") do advance() end
         return expression:sub(start, cursor - 1)
     end
 

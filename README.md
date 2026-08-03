@@ -28,7 +28,7 @@ To evaluate an expression without opening the window, pass it to `/qcalc` direct
 | Factorial | `!` (single) |
 | Unary signs | `-x`, `+x` |
 | Grouping | `( )` |
-| Functions | `sqrt` `abs` `exp` `ln` `log` `sin` `cos` `tan` `asin` `acos` `atan` `floor` `ceil` `rad` `deg` |
+| Functions | `sqrt` `abs` `exp` `ln` `log` `log2` `sin` `cos` `tan` `asin` `acos` `atan` `floor` `ceil` `round` `trunc` `sign` `rad` `deg` |
 | Constants | `pi` `e` |
 
 > Trigonometric functions use radians.

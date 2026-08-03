@@ -243,6 +243,30 @@ function TestFunctions:testCeil()
     luaunit.assertEquals(parse("ceil(3.1)"), 4)
 end
 
+function TestFunctions:testRoundUp()
+    luaunit.assertEquals(parse("round(2.5)"), 3)
+end
+
+function TestFunctions:testRoundNegativeHalfAwayFromZero()
+    luaunit.assertEquals(parse("round(-2.5)"), -3)
+end
+
+function TestFunctions:testTruncTowardZero()
+    luaunit.assertEquals(parse("trunc(-3.9)"), -3)
+end
+
+function TestFunctions:testSignNegative()
+    luaunit.assertEquals(parse("sign(-42)"), -1)
+end
+
+function TestFunctions:testSignZero()
+    luaunit.assertEquals(parse("sign(0)"), 0)
+end
+
+function TestFunctions:testLog2()
+    luaunit.assertAlmostEquals(parse("log2(8)"), 3, 0.0001)
+end
+
 function TestFunctions:testCosOfZero()
     luaunit.assertEquals(parse("cos(0)"), 1)
 end

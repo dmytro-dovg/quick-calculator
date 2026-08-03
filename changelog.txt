@@ -4,6 +4,7 @@ Date: 2026-xx-xx
   Features:
     - Added support for scientific E notation. e.g. 2e+2, 2e-2, etc.
     - Added SI suffix support. e.g. 1k, 1M, etc.
+    - Added functions: log2, round, trunc, sign.
   Bugfixes:
     - Factorial is limited to 170. Computing factorial of a large number could make the game freeze.
 ---------------------------------------------------------------------------------------------------
