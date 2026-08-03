@@ -28,11 +28,6 @@ local si_suffixes = {
     G = 1e9,
     T = 1e12,
     P = 1e15,
-    E = 1e18,
-    Z = 1e21,
-    Y = 1e24,
-    R = 1e27,
-    Q = 1e30,
 }
 
 local constants = {
