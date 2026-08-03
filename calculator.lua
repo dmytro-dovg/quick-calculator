@@ -18,16 +18,33 @@ local functions = {
     deg = math.deg,
 }
 
+local si_suffixes = {
+    k = 1e3,
+    M = 1e6,
+    G = 1e9,
+    T = 1e12,
+    P = 1e15,
+    E = 1e18,
+    Z = 1e21,
+    Y = 1e24,
+    R = 1e27,
+    Q = 1e30,
+}
+
 local constants = {
     pi = math.pi,
     e  = math.exp(1),
 }
+
+-- 171! overflows to inf.
+local max_factorial = 170
 
 Calculator.Error = {
     EXPECTED_NUMBER = "expected-number",
     INVALID_NUMBER = "invalid-number",
     FACTORIAL_NEGATIVE = "factorial-negative",
     FACTORIAL_NON_INTEGER = "factorial-non-integer",
+    FACTORIAL_TOO_LARGE = "factorial-too-large",
     EXPECTED_CLOSING_PAREN = "expected-closing-paren",
     EXPECTED_OPENING_PAREN = "expected-opening-paren",
     UNEXPECTED_END = "unexpected-end",
@@ -61,9 +78,9 @@ function Calculator.parseExpression(expression)
     end
 
     ---@param code string one of Calculator.Error
-    ---@param value any? optional detail for the message
-    local function fail(code, value)
-        error({ code = code, position = cursor, value = value }, 0)
+    ---@param ... any optional detail for the message
+    local function fail(code, ...)
+        error({ code = code, position = cursor, value = {...} }, 0)
     end
 
     local function skip_spaces()
@@ -114,6 +131,9 @@ function Calculator.parseExpression(expression)
         end
         if n ~= math.floor(n) then
             fail(Error.FACTORIAL_NON_INTEGER, n)
+        end
+        if n > max_factorial then
+            fail(Error.FACTORIAL_TOO_LARGE, n, max_factorial)
         end
         local result = 1
         for i = 2, n do
@@ -170,7 +190,11 @@ function Calculator.parseExpression(expression)
 
     local function parsePostfix()
         local value = parseAtom()
-        -- Only a single "!" is allowed
+        local suffix = si_suffixes[next_character()]
+        if suffix then
+            advance()
+            value = value * suffix
+        end
         if next_character() == "!" then
             advance()
             value = factorial(value)

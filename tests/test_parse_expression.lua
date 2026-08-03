@@ -91,6 +91,11 @@ function TestFactorial:testNestedFactorialAndExponent()
     luaunit.assertEquals(parse("3!^2"), 36)
 end
 
+function TestFactorial:testMaxFactorialIsFinite()
+    local result = parse("170!")
+    luaunit.assertTrue(result > 0 and result < math.huge)
+end
+
 -- Unary plus and minus
 TestUnaryOperators = {}
 
@@ -334,6 +339,14 @@ end
 
 function TestErrors:testDoubleFactorial()
     luaunit.assertError(parse, "3!!")
+end
+
+function TestErrors:testFactorialTooLarge()
+    luaunit.assertError(parse, "171!")
+end
+
+function TestErrors:testFactorialOfSuffixTooLarge()
+    luaunit.assertError(parse, "1k!")
 end
 
 function TestErrors:testMalformedNumberMultipleDots()

@@ -16,7 +16,14 @@ function Utility.localise_parse_error(err)
     end
     local detail
     if err.value ~= nil then
-        detail = { "quick-calculator-error." .. err.code, tostring(err.value) }
+        detail = { "quick-calculator-error." .. err.code }
+        if type(err.value) == "table" then
+            for _, value in ipairs(err.value) do
+                table.insert(detail, tostring(value))
+            end
+        else
+            table.insert(detail, tostring(err.value))
+        end
     else
         detail = { "quick-calculator-error." .. err.code }
     end
