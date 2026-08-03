@@ -20,18 +20,55 @@ To evaluate an expression without opening the window, pass it to `/qcalc` direct
 
 ## Supported syntax
 
-| Category | Operators / names |
-|----------|-------------------|
-| Arithmetic | `+` `-` `*` `/` |
-| Modulo | `%` |
-| Exponent | `^` or `**` |
-| Factorial | `!` (single) |
-| Unary signs | `-x`, `+x` |
-| Grouping | `( )` |
-| Functions | `sqrt` `abs` `exp` `ln` `log` `log2` `sin` `cos` `tan` `asin` `acos` `atan` `floor` `ceil` `round` `trunc` `sign` `rad` `deg` |
-| Constants | `pi` `e` |
+### Numbers
 
-> Trigonometric functions use radians.
+| Form | Example |
+|------|---------|
+| Decimal | `42`, `3.14`, `.5` |
+| Scientific notation | `2e3 = 2000`, `1.5e-4 = 0.00015` |
+| SI suffix | `10k = 10000`, `2.5M = 2500000` |
+
+SI suffixes are `k` `M` `G` `T` `P` (10^3 through 10^15).
+
+### Operators
+
+| Operator | Description | Example |
+|----------|---------|---------|
+| `+` `-` `*` `/` | add, subtract, multiply, divide | `2 + 3 * 4 = 14` |
+| `%` | modulo (remainder) | `10 % 3 = 1` |
+| `^` `**` | exponent or power | `2 ^ 10 = 1024`, `2 ** 3 = 8` |
+| `!` | factorial | `5! = 120` |
+| `-x` `+x` | unary sign | `-3`, `+3` |
+| `( )` | grouping | `(2 + 3) * 4 = 20` |
+
+### Functions
+
+Called as `name(x)`, e.g. `sqrt(2 + 7)`.
+
+| Function | Description | Example |
+|----------|---------|---------|
+| `sqrt` | square root | `sqrt(9) = 3` |
+| `abs` | absolute value | `abs(-7) = 7` |
+| `exp` | e to the power x | `exp(1) = 2.71828...` |
+| `ln` | natural logarithm | `ln(e) = 1` |
+| `log` | base-10 logarithm | `log(1000) = 3` |
+| `log2` | base-2 logarithm | `log2(8) = 3` |
+| `sin` `cos` `tan` | trigonometry (radians) | `cos(0) = 1` |
+| `asin` `acos` `atan` | inverse trigonometry (radians) | `acos(1) = 0` |
+| `rad` | degrees to radians | `rad(180) = 3.14159...` |
+| `deg` | radians to degrees | `deg(pi) = 180` |
+| `floor` | round down | `floor(3.9) = 3` |
+| `ceil` | round up | `ceil(3.1) = 4` |
+| `round` | round to nearest | `round(2.5) = 3` |
+| `trunc` | round toward zero | `trunc(-3.9) = -3` |
+| `sign` | sign (-1, 0, or 1) | `sign(-42) = -1` |
+
+### Constants
+
+| Constant | Value |
+|----------|-------|
+| [pi](https://en.wikipedia.org/wiki/Pi) | `3.14159...` |
+| [e](https://en.wikipedia.org/wiki/E_(mathematical_constant)) | `2.71828...` |
 
 ## License
 
