@@ -44,6 +44,7 @@ Calculator.Error = {
     FACTORIAL_NEGATIVE = "factorial-negative",
     FACTORIAL_NON_INTEGER = "factorial-non-integer",
     FACTORIAL_TOO_LARGE = "factorial-too-large",
+    EXPECTED_CLOSING_BAR = "expected-closing-bar",
     EXPECTED_CLOSING_PAREN = "expected-closing-paren",
     EXPECTED_OPENING_PAREN = "expected-opening-paren",
     UNEXPECTED_END = "unexpected-end",
@@ -135,7 +136,16 @@ function Calculator.parseExpression(expression)
 
     local function parseAtom()
         local character = next_character()
-        if character == "(" then
+        if character == "|" then
+            advance()
+            local value = parse()
+            skip_spaces()
+            if next_character() ~= "|" then
+                fail(Error.EXPECTED_CLOSING_BAR)
+            end
+            advance()
+            return math.abs(value)
+        elseif character == "(" then
             advance()
             local value = parse()
             skip_spaces()

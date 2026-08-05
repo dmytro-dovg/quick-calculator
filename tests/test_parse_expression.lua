@@ -174,6 +174,26 @@ function TestPrecedenceAndParens:testNestedParens()
     luaunit.assertEquals(parse("((2+3)*(4-1))"), 15)
 end
 
+function TestPrecedenceAndParens:testAbsoluteValueGrouping()
+    luaunit.assertEquals(parse("|-15|"), 15)
+end
+
+function TestPrecedenceAndParens:testAbsoluteValueNestedGrouping()
+    luaunit.assertEquals(parse("|-15 + |-7||"), 8)
+end
+
+function TestPrecedenceAndParens:testAbsoluteValueAdjacentGroups()
+    luaunit.assertEquals(parse("|3| + |-2|"), 5)
+end
+
+function TestPrecedenceAndParens:testAbsoluteValueAsFactor()
+    luaunit.assertEquals(parse("2 * |-3|"), 6)
+end
+
+function TestPrecedenceAndParens:testAbsoluteValueBindsTighterThanExponent()
+    luaunit.assertEquals(parse("|-2|^2"), 4)
+end
+
 -- Number literals
 TestNumberLiterals = {}
 
@@ -419,6 +439,14 @@ end
 
 function TestErrors:testFunctionMissingClosingParen()
     luaunit.assertError(parse, "sqrt(9")
+end
+
+function TestErrors:testUnmatchedBar()
+    luaunit.assertError(parse, "|-7")
+end
+
+function TestErrors:testEmptyBars()
+    luaunit.assertError(parse, "||")
 end
 
 os.exit(luaunit.LuaUnit.run())

@@ -40,6 +40,7 @@ SI suffixes are `k` `M` `G` `T` `P` (10^3 through 10^15).
 | `!` | factorial | `5! = 120` |
 | `-x` `+x` | unary sign | `-3`, `+3` |
 | `( )` | grouping | `(2 + 3) * 4 = 20` |
+| `\| \|` | absolute value | `\|-7\| = 7` |
 
 ### Functions
 
