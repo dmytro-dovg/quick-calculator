@@ -421,6 +421,22 @@ function TestErrors:testHexPrefixWithoutDigits()
     luaunit.assertError(parse, "0x")
 end
 
+function TestErrors:testInvalidBinaryDigit()
+    luaunit.assertError(parse, "0b12")
+end
+
+function TestErrors:testInvalidOctalDigit()
+    luaunit.assertError(parse, "0o8")
+end
+
+function TestErrors:testInvalidHexDigit()
+    luaunit.assertError(parse, "0xG")
+end
+
+function TestErrors:testBaseLiteralWithSuffixLetter()
+    luaunit.assertError(parse, "0xFG")
+end
+
 function TestErrors:testBinaryPrefixWithoutDigits()
     luaunit.assertError(parse, "0b")
 end

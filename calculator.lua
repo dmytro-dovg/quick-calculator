@@ -94,6 +94,7 @@ function Calculator.parseExpression(expression)
 
     local function consumeNumber()
         skip_spaces()
+        -- Handle other bases
         if expression:sub(cursor, cursor) == "0" then
             local base = number_bases[expression:sub(cursor + 1, cursor + 1):lower()]
             if base then
@@ -101,11 +102,11 @@ function Calculator.parseExpression(expression)
                 advance(2)
                 local digit_start = cursor
                 while expression:sub(cursor, cursor):match(base.digits) do advance() end
-                local num = tonumber(expression:sub(digit_start, cursor - 1), base.value)
-                if not num then
+                if cursor == digit_start or expression:sub(cursor, cursor):match("%w") then
+                    while expression:sub(cursor, cursor):match("%w") do advance() end
                     fail(Error.INVALID_NUMBER, expression:sub(literal_start, cursor - 1))
                 end
-                return num
+                return tonumber(expression:sub(digit_start, cursor - 1), base.value)
             end
         end
 
