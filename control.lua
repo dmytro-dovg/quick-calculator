@@ -86,7 +86,7 @@ local function show(player_index)
         input_textfield.style.top_padding = 4
         input_textfield.style.bottom_padding = 4
         input_textfield.style.font_color = { 0.8, 0.8, 0.8 }
-        input_textfield.style.font = "default-large-semibold"
+        input_textfield.style.font = "quick-calculator-mono-18"
 
         local cross_button = section_1.add {
             type = "sprite-button",
@@ -117,7 +117,7 @@ local function show(player_index)
             style = "quick-calculator_orange-label",
         }
         result_label.style.vertical_align = "center"
-        result_label.style.bottom_padding = 4
+        result_label.style.bottom_padding = 2
 
         local result_textfield = section_2.add {
             type = "text-box",
@@ -128,7 +128,7 @@ local function show(player_index)
         result_textfield.selectable = true
         result_textfield.style.horizontal_align = "left"
         result_textfield.style.font_color = { 0.8, 0.8, 0.8 }
-        result_textfield.style.font = "default-large-semibold"
+        result_textfield.style.font = "quick-calculator-mono-18"
         result_textfield.style.horizontally_stretchable = true
         result_textfield.style.maximal_width = 0
 

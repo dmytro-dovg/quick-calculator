@@ -1,8 +1,15 @@
-local orange_large = {
+local mono_18 = {
     type = "font",
-    name = "quick-calculator_orange-large",
-    from = "default-semibold",
-    size = 20
+    name = "quick-calculator-mono-18",
+    from = "quick-calculator-mono",
+    size = 18,
 }
 
-data:extend({ orange_large, })
+local mono_20 = {
+    type = "font",
+    name = "quick-calculator-mono-20",
+    from = "quick-calculator-mono",
+    size = 20,
+}
+
+data:extend({ mono_18, mono_20, })

@@ -37,5 +37,5 @@ styles["quick-calculator_result-textfield"] = {
 styles["quick-calculator_orange-label"] = {
     type = "label_style",
     parent = "orange_label",
-    font = "quick-calculator_orange-large",
+    font = "quick-calculator-mono-20",
 }
