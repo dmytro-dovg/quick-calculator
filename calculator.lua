@@ -30,6 +30,12 @@ local si_suffixes = {
     P = 1e15,
 }
 
+local number_bases = {
+    x = { value = 16, digits = "%x" },
+    b = { value = 2, digits = "[01]" },
+    o = { value = 8, digits = "[0-7]" },
+}
+
 local constants = {
     pi = math.pi,
     e  = math.exp(1),
@@ -88,6 +94,21 @@ function Calculator.parseExpression(expression)
 
     local function consumeNumber()
         skip_spaces()
+        if expression:sub(cursor, cursor) == "0" then
+            local base = number_bases[expression:sub(cursor + 1, cursor + 1):lower()]
+            if base then
+                local literal_start = cursor
+                advance(2)
+                local digit_start = cursor
+                while expression:sub(cursor, cursor):match(base.digits) do advance() end
+                local num = tonumber(expression:sub(digit_start, cursor - 1), base.value)
+                if not num then
+                    fail(Error.INVALID_NUMBER, expression:sub(literal_start, cursor - 1))
+                end
+                return num
+            end
+        end
+
         local start = cursor
         while expression:sub(cursor, cursor):match("[%d%.eE]") do advance() end
         if cursor == start then

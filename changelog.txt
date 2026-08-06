@@ -3,6 +3,7 @@ Version: 2.1.8
 Date: 2026-xx-xx
   Features:
     - Added support for absolute value grouping. e.g. |-7|
+    - Added hex, binary, and octal literals. e.g. 0xFF, 0b1010, 0o17
 ---------------------------------------------------------------------------------------------------
 Version: 2.1.7
 Date: 2026-08-03

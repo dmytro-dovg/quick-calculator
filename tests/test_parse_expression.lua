@@ -229,6 +229,26 @@ function TestNumberLiterals:testScientificImplicit()
     luaunit.assertEquals(parse("2e2+2"), 202)
 end
 
+function TestNumberLiterals:testHexLiteral()
+    luaunit.assertEquals(parse("0xFF"), 255)
+end
+
+function TestNumberLiterals:testHexMixedCasePrefix()
+    luaunit.assertEquals(parse("0XfF"), 255)
+end
+
+function TestNumberLiterals:testBinaryLiteral()
+    luaunit.assertEquals(parse("0b1010"), 10)
+end
+
+function TestNumberLiterals:testOctalLiteral()
+    luaunit.assertEquals(parse("0o17"), 15)
+end
+
+function TestNumberLiterals:testHexInExpression()
+    luaunit.assertEquals(parse("0x10 * 2 + 1"), 33)
+end
+
 -- Whitespace
 TestWhitespace = {}
 
@@ -395,6 +415,18 @@ end
 
 function TestErrors:testMalformedNumberMultipleDots()
     luaunit.assertError(parse, "1.2.3")
+end
+
+function TestErrors:testHexPrefixWithoutDigits()
+    luaunit.assertError(parse, "0x")
+end
+
+function TestErrors:testBinaryPrefixWithoutDigits()
+    luaunit.assertError(parse, "0b")
+end
+
+function TestErrors:testOctalPrefixWithoutDigits()
+    luaunit.assertError(parse, "0o")
 end
 
 function TestErrors:testUnmatchedOpeningParen()

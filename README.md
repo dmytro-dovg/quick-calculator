@@ -25,6 +25,7 @@ You can also pass an expression straight to `/qcalc` to print the result without
 | Form | Example |
 |------|---------|
 | Decimal | `42`, `3.14`, `.5` |
+| Hex / binary / octal | `0xFF = 255`, `0b1010 = 10`, `0o17 = 15` |
 | Scientific notation | `2e3 = 2000`, `1.5e-4 = 0.00015` |
 | SI suffix | `10k = 10000`, `2.5M = 2500000` |
 
