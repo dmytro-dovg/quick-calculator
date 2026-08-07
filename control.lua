@@ -139,10 +139,30 @@ local function show(player_index)
             sprite = "quick-calculator_warn",
             visible = false,
         }
+        local tooltip = { "", { "gui-quick-calculator.info-tooltip-header" } }
+        ---@param key string locale key suffix for the category name
+        ---@param symbols string symbols/names to show for the category
+        local function add_category(key, symbols)
+            table.insert(tooltip, "\n")
+            table.insert(tooltip, {
+                "gui-quick-calculator.info-tooltip-category",
+                { "gui-quick-calculator." .. key },
+                Utility.highlight(symbols),
+            })
+        end
+
+        add_category("info-category-basic", Utility.highlight("+ - * /", "blue"))
+        add_category("info-category-modulo", Utility.highlight("%", "blue"))
+        add_category("info-category-exponent", Utility.highlight("^ **", "blue"))
+        add_category("info-category-factorial", Utility.highlight("!", "blue"))
+        add_category("info-category-grouping", Utility.highlight("( ) | |", "blue"))
+        add_category("info-category-functions", Utility.highlight(Utility.sorted_keys(Calculator.functions), "blue"))
+        add_category("info-category-constants", Utility.highlight(Utility.sorted_keys(Calculator.constants), "blue"))
+
         local info_icon = icons.add {
             type = "sprite",
             sprite = "quick-calculator_info",
-            tooltip = { "gui-quick-calculator.info-tooltip" },
+            tooltip = tooltip,
         }
 
         local separator_2 = content.add { type = "line", direction ="horizontal", }
@@ -280,7 +300,8 @@ script.on_event(defines.events.on_gui_text_changed, function (event)
     if not gui_state then return end
 
     local result_textfield = gui_state.result_textfield
-    if not result_textfield then return end
+    local input_textfield = gui_state.input_textfield
+    if not result_textfield or not input_textfield then return end
 
     local text = event.text
     if text:len() == 0 then

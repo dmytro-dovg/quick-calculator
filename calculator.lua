@@ -1,6 +1,6 @@
 local Calculator = {}
 
-local functions = {
+Calculator.functions = {
     sqrt = math.sqrt,
     abs = math.abs,
     exp = math.exp,
@@ -22,7 +22,7 @@ local functions = {
     deg = math.deg,
 }
 
-local si_suffixes = {
+Calculator.si_suffixes = {
     k = 1e3,
     M = 1e6,
     G = 1e9,
@@ -30,19 +30,19 @@ local si_suffixes = {
     P = 1e15,
 }
 
-local number_bases = {
+Calculator.number_bases = {
     x = { value = 16, digits = "%x" },
     b = { value = 2, digits = "[01]" },
     o = { value = 8, digits = "[0-7]" },
 }
 
-local constants = {
+Calculator.constants = {
     pi = math.pi,
     e  = math.exp(1),
 }
 
 -- 171! overflows to inf.
-local max_factorial = 170
+Calculator.max_factorial = 170
 
 Calculator.Error = {
     EXPECTED_NUMBER = "expected-number",
@@ -74,7 +74,7 @@ function Calculator.parseExpression(expression)
     end
 
     ---@param code string one of Calculator.Error
-    ---@param ... any optional detail for the message
+    ---@vararg any optional detail for the message
     local function fail(code, ...)
         error({ code = code, position = cursor, value = {...} }, 0)
     end
@@ -96,7 +96,7 @@ function Calculator.parseExpression(expression)
         skip_spaces()
         -- Handle other bases
         if expression:sub(cursor, cursor) == "0" then
-            local base = number_bases[expression:sub(cursor + 1, cursor + 1):lower()]
+            local base = Calculator.number_bases[expression:sub(cursor + 1, cursor + 1):lower()]
             if base then
                 local literal_start = cursor
                 advance(2)
@@ -104,7 +104,7 @@ function Calculator.parseExpression(expression)
                 while expression:sub(cursor, cursor):match(base.digits) do advance() end
                 if cursor == digit_start or expression:sub(cursor, cursor):match("%w") then
                     while expression:sub(cursor, cursor):match("%w") do advance() end
-                    fail(Error.INVALID_NUMBER, expression:sub(literal_start, cursor - 1))
+                    fail(Error.INVALID_NUMBER, expression:sub(literal_start, cursor - 1), literal_start)
                 end
                 return tonumber(expression:sub(digit_start, cursor - 1), base.value)
             end
@@ -144,8 +144,8 @@ function Calculator.parseExpression(expression)
         if n ~= math.floor(n) then
             fail(Error.FACTORIAL_NON_INTEGER, n)
         end
-        if n > max_factorial then
-            fail(Error.FACTORIAL_TOO_LARGE, n, max_factorial)
+        if n > Calculator.max_factorial then
+            fail(Error.FACTORIAL_TOO_LARGE, n, Calculator.max_factorial)
         end
         local result = 1
         for i = 2, n do
@@ -180,7 +180,7 @@ function Calculator.parseExpression(expression)
             fail(Error.UNEXPECTED_END)
         elseif character:match("%a") then
             local name = consumeIdentifier()
-            local fn = functions[name]
+            local fn = Calculator.functions[name]
             if next_character() == "(" then
                 if not fn then
                     fail(Error.UNKNOWN_FUNCTION, name)
@@ -194,7 +194,7 @@ function Calculator.parseExpression(expression)
                 advance()
                 return fn(argument)
             end
-            local value = constants[name]
+            local value = Calculator.constants[name]
             if value == nil then
                 if fn then
                     fail(Error.EXPECTED_OPENING_PAREN, name)
@@ -211,7 +211,7 @@ function Calculator.parseExpression(expression)
 
     local function parsePostfix()
         local value = parseAtom()
-        local suffix = si_suffixes[next_character()]
+        local suffix = Calculator.si_suffixes[next_character()]
         if suffix then
             advance()
             value = value * suffix

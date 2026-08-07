@@ -8,6 +8,25 @@ function Utility.d(msg)
     localised_print(message)
 end
 
+---@param t table
+---@return string
+function Utility.sorted_keys(t)
+    local keys = {}
+    for key in pairs(t) do keys[#keys + 1] = tostring(key) end
+    table.sort(keys)
+    return table.concat(keys, " ")
+end
+
+---@param text string
+---@param color string?
+function Utility.highlight(text, color)
+    local result = "[font=quick-calculator-mono-12]" .. text .. "[/font]"
+    if color then
+        result = "[color="  .. color .. "]" .. result .. "[/color]"
+    end
+    return result
+end
+
 ---@param err table | string error raised by Calculator.parseExpression
 ---@return LocalisedString
 function Utility.localise_parse_error(err)
@@ -19,14 +38,14 @@ function Utility.localise_parse_error(err)
         detail = { "quick-calculator-error." .. err.code }
         if type(err.value) == "table" then
             for _, value in ipairs(err.value) do
-                table.insert(detail, tostring(value))
+                table.insert(detail, Utility.highlight(tostring(value), "yellow"))
             end
         else
-            table.insert(detail, tostring(err.value))
+            table.insert(detail, Utility.highlight(tostring(err.value), "red"))
         end
     else
         detail = { "quick-calculator-error." .. err.code }
     end
-    return { "quick-calculator-error.parse-error", err.position, detail }
+    return { "quick-calculator-error.parse-error", Utility.highlight(err.position, "yellow"), detail }
 end
 return Utility
