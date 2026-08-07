@@ -139,30 +139,49 @@ local function show(player_index)
             sprite = "quick-calculator_warn",
             visible = false,
         }
-        local tooltip = { "", { "gui-quick-calculator.info-tooltip-header" } }
-        ---@param key string locale key suffix for the category name
-        ---@param symbols string symbols/names to show for the category
-        local function add_category(key, symbols)
-            table.insert(tooltip, "\n")
-            table.insert(tooltip, {
-                "gui-quick-calculator.info-tooltip-category",
+
+        -- Info icon and tooltip
+        local info_tooltip = { "", { "gui-quick-calculator.info-tooltip-header" } }
+        ---@param key string locale key suffix
+        local function add_section(key)
+            table.insert(info_tooltip, { "gui-quick-calculator.info-tooltip-section", { "gui-quick-calculator." .. key } })
+        end
+        ---@param key string locale key suffix
+        ---@param symbols string items
+        local function add_row(key, symbols)
+            table.insert(info_tooltip, {
+                "gui-quick-calculator.info-tooltip-row",
                 { "gui-quick-calculator." .. key },
-                Utility.highlight(symbols),
+                Utility.highlight(symbols, "blue"),
             })
         end
+        ---@param symbols string list of names
+        local function add_list(symbols)
+            table.insert(info_tooltip, { "gui-quick-calculator.info-tooltip-list", Utility.highlight(symbols, "blue") })
+        end
 
-        add_category("info-category-basic", Utility.highlight("+ - * /", "blue"))
-        add_category("info-category-modulo", Utility.highlight("%", "blue"))
-        add_category("info-category-exponent", Utility.highlight("^ **", "blue"))
-        add_category("info-category-factorial", Utility.highlight("!", "blue"))
-        add_category("info-category-grouping", Utility.highlight("( ) | |", "blue"))
-        add_category("info-category-functions", Utility.highlight(Utility.sorted_keys(Calculator.functions), "blue"))
-        add_category("info-category-constants", Utility.highlight(Utility.sorted_keys(Calculator.constants), "blue"))
+        add_section("info-section-numbers")
+        add_row("info-row-decimal", "42 3.14 .5")
+        add_row("info-row-scientific", "2e3 1.5e-4")
+        add_row("info-row-si", Utility.sorted_keys_by_value(Calculator.si_suffixes))
+        add_row("info-row-bases", "0xFF 0b1010 0o17")
 
-        local info_icon = icons.add {
+        add_section("info-section-operations")
+        add_row("info-row-basic", "+ - * /")
+        add_row("info-row-modulo", "%")
+        add_row("info-row-exponent", "^ **")
+        add_row("info-row-factorial", "!")
+        add_row("info-row-grouping", "( )")
+        add_row("info-row-absolute", "| |")
+        add_row("info-row-functions", Utility.sorted_keys(Calculator.functions))
+
+        add_section("info-section-constants")
+        add_list(Utility.sorted_keys(Calculator.constants))
+
+        icons.add {
             type = "sprite",
             sprite = "quick-calculator_info",
-            tooltip = tooltip,
+            tooltip = info_tooltip,
         }
 
         local separator_2 = content.add { type = "line", direction ="horizontal", }

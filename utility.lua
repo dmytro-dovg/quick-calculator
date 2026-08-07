@@ -17,6 +17,15 @@ function Utility.sorted_keys(t)
     return table.concat(keys, " ")
 end
 
+---@param t table<string, number>
+---@return string
+function Utility.sorted_keys_by_value(t)
+    local keys = {}
+    for key in pairs(t) do keys[#keys + 1] = key end
+    table.sort(keys, function(a, b) return t[a] < t[b] end)
+    return table.concat(keys, " ")
+end
+
 ---@param text string
 ---@param color string?
 function Utility.highlight(text, color)
