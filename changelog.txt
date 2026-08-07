@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.1.9
+Date: 2026-xx-xx
+  Gui:
+    - Input and result fields now use a monospaced font.
+    - Info icon tooltip is reworked to list all supported syntax, grouped by category.
+---------------------------------------------------------------------------------------------------
 Version: 2.1.8
 Date: 2026-08-06
   Features:
