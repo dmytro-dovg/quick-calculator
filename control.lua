@@ -141,9 +141,12 @@ local function show(player_index)
         }
 
         -- Info icon and tooltip
-        local info_tooltip = { "", { "gui-quick-calculator.info-tooltip-header" } }
+        local info_tooltip = { "" }
+        local has_section = false
         ---@param key string locale key suffix
         local function add_section(key)
+            if has_section then table.insert(info_tooltip, "\n\n") end
+            has_section = true
             table.insert(info_tooltip, { "gui-quick-calculator.info-tooltip-section", { "gui-quick-calculator." .. key } })
         end
         ---@param key string locale key suffix
