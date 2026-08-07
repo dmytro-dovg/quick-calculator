@@ -29,7 +29,7 @@ end
 ---@param text string
 ---@param color string?
 function Utility.highlight(text, color)
-    local result = "[font=quick-calculator-mono-12]" .. text .. "[/font]"
+    local result = "[font=default-bold]" .. text .. "[/font]"
     if color then
         result = "[color="  .. color .. "]" .. result .. "[/color]"
     end
