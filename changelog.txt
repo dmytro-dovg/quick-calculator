@@ -1,17 +1,17 @@
 ---------------------------------------------------------------------------------------------------
-Version: 2.1.9
-Date: 2026-xx-xx
+Version: 2.0.9
+Date: 2026-08-07
   Gui:
     - Input and result fields now use a monospaced font.
     - Info icon tooltip is reworked to list all supported syntax, grouped by category.
 ---------------------------------------------------------------------------------------------------
-Version: 2.1.8
+Version: 2.0.8
 Date: 2026-08-06
   Features:
     - Added support for absolute value grouping. e.g. |-7|
     - Added hex, binary, and octal literals. e.g. 0xFF, 0b1010, 0o17
 ---------------------------------------------------------------------------------------------------
-Version: 2.1.7
+Version: 2.0.7
 Date: 2026-08-03
   Features:
     - Added support for scientific E notation. e.g. 2e+2, 2e-2, etc.
@@ -20,40 +20,40 @@ Date: 2026-08-03
   Bugfixes:
     - Factorial is limited to 170. Computing factorial of a large number could make the game freeze.
 ---------------------------------------------------------------------------------------------------
-Version: 2.1.6
+Version: 2.0.6
 Date: 2026-08-02
   Gui:
     - Updated shortcut icons.
     - Updated warning icon.
 ---------------------------------------------------------------------------------------------------
-Version: 2.1.5
+Version: 2.0.5
 Date: 2026-08-01
   Gui:
     - Changed clear button icon to a less ambiguous one.
 ---------------------------------------------------------------------------------------------------
-Version: 2.1.4
+Version: 2.0.4
 Date: 2026-07-31
   Bugfixes:
     - Fixed "Only callable on text-box." crash.
 ---------------------------------------------------------------------------------------------------
-Version: 2.1.3
+Version: 2.0.3
 Date: 2026-07-30
   Features:
     - The /qcalc command now evaluates an expression passed as an argument and prints the result to the console (e.g. /qcalc 3 + 12/4).
     - Added rad and deg functions to convert between degrees and radians.
 ---------------------------------------------------------------------------------------------------
-Version: 2.1.2
+Version: 2.0.2
 Date: 2026-07-30
   Gui:
     - Input re-focuses on click.
     - Result can now be copied.
 ---------------------------------------------------------------------------------------------------
-Version: 2.1.1
+Version: 2.0.1
 Date: 2026-07-27
   Gui:
     - Added shortcut toggle.
 ---------------------------------------------------------------------------------------------------
-Version: 2.1.0
+Version: 2.0.0
 Date: 2026-07-25
   Features:
     - Added Calculator pop-up window.
