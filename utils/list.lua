@@ -58,4 +58,16 @@ function List.length(list)
     return list.last - list.first + 1
 end
 
+---@generic T
+---@param list List<T>
+---@param index integer
+function List.remove_shift_left(list, index)
+    if index < list.first or index > list.last then error("index out of range") end
+    for i = index, list.last - 1 do
+        list[i] = list[i + 1]
+    end
+    list[list.last] = nil
+    list.last = list.last - 1
+end
+
 return List

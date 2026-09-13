@@ -18,6 +18,8 @@ local Settings = require "utils.settings-helper"
 ---@field warning_icon LuaGuiElement?
 ---@field history_section LuaGuiElement?
 ---@field history_separator LuaGuiElement?
+---@field history_pane LuaGuiElement?
+---@field history_button LuaGuiElement?
 
 ---@class PlayerState
 ---@field gui GuiState
@@ -49,6 +51,32 @@ end
 local function player_gui_state(player_index)
     local state = storage.players[player_index]
     return state and state.gui
+end
+
+---@param pane LuaGuiElement
+---@param result_history List<HistoryEntry>
+local function populate_history(pane, result_history)
+    pane.clear()
+    for i = result_history.last, result_history.first, -1 do
+        if i ~= result_history.last then
+            pane.add { type = "line", direction = "horizontal", }
+        end
+        local entry_flow = pane.add { type = "flow", direction = "horizontal", name = C.gui.history.flow .. tostring(i) }
+        entry_flow.add {
+            type = "label",
+            caption = result_history[i].expression,
+            style = "quick-calculator_history-entry-label",
+            name = C.gui.history.expression_label .. tostring(i),
+        }
+        local empty_space = entry_flow.add { type = "empty-widget", }
+        empty_space.style.horizontally_stretchable = true
+        entry_flow.add {
+            type = "label",
+            caption = result_history[i].result,
+            style = "quick-calculator_history-entry-label",
+            name = C.gui.history.result_label .. tostring(i),
+        }
+    end
 end
 
 ---@param player_index integer
@@ -133,6 +161,7 @@ local function show(player_index)
             history_button.style.padding = 0
             history_button.enabled = has_history
             history_button.toggled = show_history
+            gui_state.history_button = history_button
         end
 
         local input_separator = content.add { type = "line", direction ="horizontal", }
@@ -236,26 +265,7 @@ local function show(player_index)
         history_pane.style.left_padding = 8
         history_pane.style.right_padding = 8
         history_pane.style.margin = 0
-        for i = state.result_history.last, state.result_history.first, -1 do
-            if i ~= state.result_history.last then
-                history_pane.add { type = "line", direction ="horizontal", }
-            end
-            local entry_flow = history_pane.add { type = "flow", direction = "horizontal", name=C.gui.history.flow .. tostring(i) }
-            entry_flow.add {
-                type = "label",
-                caption = state.result_history[i].expression,
-                style = "quick-calculator_history-entry-label",
-                name = C.gui.history.expression_label .. tostring(i),
-            }
-            local empty_space = entry_flow.add { type = "empty-widget", }
-            empty_space.style.horizontally_stretchable = true
-            entry_flow.add {
-                type = "label",
-                caption = state.result_history[i].result,
-                style = "quick-calculator_history-entry-label",
-                name = C.gui.history.result_label .. tostring(i),
-            }
-        end
+        populate_history(history_pane, state.result_history)
 
         local history_separator = content.add { type = "line", direction ="horizontal", }
         history_separator.style.left_margin = 0
@@ -303,6 +313,7 @@ local function show(player_index)
         gui_state.warning_icon = warning_icon
         gui_state.history_section = history_section
         gui_state.history_separator = history_separator
+        gui_state.history_pane = history_pane
 
         input_textfield.focus()
         player.opened = frame
@@ -463,9 +474,23 @@ script.on_event(defines.events.on_gui_click, function(event)
     -- History
     local history_entry_index = tonumber(event.element.name:match(C.gui.history.pattern))
     if history_entry_index then
-        local history_entry = state.result_history[history_entry_index]
-        input_textfield.text = history_entry.expression
-        result_textfield.text = history_entry.result
+        if event.button == defines.mouse_button_type.left then
+            local history_entry = state.result_history[history_entry_index]
+            input_textfield.text = history_entry.expression
+            result_textfield.text = history_entry.result
+        elseif event.button == defines.mouse_button_type.right then
+            List.remove_shift_left(state.result_history, history_entry_index)
+            populate_history(gui_state.history_pane, state.result_history)
+
+            if List.length(state.result_history) == 0 then
+                gui_state.history_section.visible = false
+                gui_state.history_separator.visible = false
+            end
+            if gui_state.history_button then
+                gui_state.history_button.enabled = List.length(state.result_history) > 0
+                gui_state.history_button.toggled = state.history_toggled
+            end
+        end
         return
     end
 
