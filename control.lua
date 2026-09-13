@@ -80,7 +80,7 @@ local function show(player_index)
         history_section.style.padding = 4
         history_section.style.left_padding = 8
         history_section.style.right_padding = 8
-        local history_pane = history_section.add { type = "scroll-pane", direction = "vertical", name="fllllo" }
+        local history_pane = history_section.add { type = "scroll-pane", direction = "vertical" }
 
         for i = state.result_history.first, state.result_history.last do
             if i ~= state.result_history.first then
@@ -469,20 +469,21 @@ end)
 script.on_event(defines.events.on_gui_confirmed, function (event)
     if event.element.name ~= C.gui.input_textfield then return end
 
+    hide(event.player_index)
+
     local state = storage.players[event.player_index]
     if not state then return end
 
     -- Only store an expression if it's different from the last
-    if state.valid_result and state.result_history[state.result_history.last].expression ~= state.valid_result.expression then
+    if state.valid_result and
+     (List.length(state.result_history) == 0 or state.result_history[state.result_history.last].expression ~= state.valid_result.expression) then
         List.pushright(state.result_history, state.valid_result)
     end
 
     if List.length(state.result_history) > Settings.history_capacity(event.player_index) then
         List.popleft(state.result_history)
     end
-    valid_result = nil
-    localised_print(serpent.block(state.result_history))
-    hide(event.player_index)
+
 end)
 
 script.on_init(function()
