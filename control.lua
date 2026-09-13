@@ -16,12 +16,14 @@ local Settings = require "utils.settings-helper"
 ---@field result_textfield LuaGuiElement?
 ---@field cross_button LuaGuiElement?
 ---@field warning_icon LuaGuiElement?
----@field history_toggled boolean
+---@field history_section LuaGuiElement?
+---@field history_separator LuaGuiElement?
 
 ---@class PlayerState
 ---@field gui GuiState
 ---@field result_history List<HistoryEntry>
 ---@field valid_result HistoryEntry?
+---@field history_toggled boolean
 
 ---@class ModStorage
 ---@field players table<integer, PlayerState>
@@ -74,7 +76,10 @@ local function show(player_index)
         content.style.padding = 0
         content.style.bottom_margin = 0
         -- == History section ==
+        local has_history = List.length(state.result_history) > 0
+        local show_history = has_history and (state.history_toggled or false)
         local history_section = content.add { type = "frame", style = "inside_shallow_frame", }
+        history_section.visible = show_history
 
         history_section.style.margin = 8
         history_section.style.padding = 4
@@ -104,6 +109,7 @@ local function show(player_index)
 
         local separator_1 = content.add { type = "line", direction ="horizontal", }
         separator_1.style.left_margin = 0
+        separator_1.visible = show_history
 
         -- == Input section ==
         local input_section = content.add { type = "flow", direction = "horizontal", }
@@ -150,13 +156,15 @@ local function show(player_index)
             name = C.gui.history_button,
             style = "frame_action_button",
             sprite = "quick-calculator_history",
-            tooltip = { "gui-quick-calculator.clear-tooltip" },
+            tooltip = { "gui-quick-calculator.history-tooltip" },
             resize_to_sprite = false,
         }
 
         history_button.style.left_margin = 8
         history_button.style.size = 28
         history_button.style.padding = 0
+        history_button.enabled = has_history
+        history_button.toggled = show_history
 
         local separator_2 = content.add { type = "line", direction ="horizontal", }
         separator_2.style.left_margin = 0
@@ -290,6 +298,8 @@ local function show(player_index)
         gui_state.result_textfield = result_textfield
         gui_state.cross_button = cross_button
         gui_state.warning_icon = warning_icon
+        gui_state.history_section = history_section
+        gui_state.history_separator = separator_1
 
         input_textfield.focus()
         player.opened = frame
@@ -330,6 +340,7 @@ local function init_player(player_index)
     storage.players[player_index] = {
         gui = { },
         result_history = List.new(),
+        history_toggled = false,
     }
 end
 
@@ -438,6 +449,15 @@ script.on_event(defines.events.on_gui_click, function(event)
     -- Refocus on input textfield
     if is_descendant(event.element, main_frame) and input_textfield and result_textfield and event.element ~= result_textfield then
         input_textfield.focus()
+    end
+
+    -- Toggle history panel
+    if event.element.name == C.gui.history_button then
+        state.history_toggled = not state.history_toggled
+        gui_state.history_section.visible = state.history_toggled
+        gui_state.history_separator.visible = state.history_toggled
+        event.element.toggled = state.history_toggled
+        return
     end
 
     -- History
