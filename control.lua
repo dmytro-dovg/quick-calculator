@@ -23,6 +23,7 @@ local Settings = require "utils.settings-helper"
 ---@field gui GuiState
 ---@field result_history List<HistoryEntry>
 ---@field valid_result HistoryEntry?
+---@field last_result HistoryEntry?
 ---@field history_toggled boolean
 
 ---@class ModStorage
@@ -285,12 +286,9 @@ local function show(player_index)
             element.ignored_by_interaction = true
         end
 
-        if Settings.remember_last_expression(player_index) then
-            local last_entry = state.result_history[state.result_history.last]
-            if last_entry then
-                input_textfield.text = last_entry.expression
-                result_textfield.text = last_entry.result
-            end
+        if Settings.remember_last_expression(player_index) and state.last_result then
+            input_textfield.text = state.last_result.expression
+            result_textfield.text = state.last_result.result
         end
 
         content.drag_target = frame
@@ -498,10 +496,14 @@ script.on_event(defines.events.on_gui_confirmed, function (event)
     local state = storage.players[event.player_index]
     if not state then return end
 
-    -- Only store an expression if it's different from the last
-    if state.valid_result and
-     (List.length(state.result_history) == 0 or state.result_history[state.result_history.last].expression ~= state.valid_result.expression) then
-        List.pushright(state.result_history, state.valid_result)
+    if state.valid_result then
+        state.last_result = state.valid_result
+
+        -- Only store an expression if it's different from the last
+        if List.length(state.result_history) == 0
+            or state.result_history[state.result_history.last].expression ~= state.valid_result.expression then
+            List.pushright(state.result_history, state.valid_result)
+        end
     end
 
     if List.length(state.result_history) > Settings.history_capacity(event.player_index) then
