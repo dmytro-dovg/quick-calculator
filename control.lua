@@ -22,7 +22,6 @@ local Settings = require "utils.settings-helper"
 ---@class PlayerState
 ---@field gui GuiState
 ---@field result_history List<HistoryEntry>
----@field valid_result HistoryEntry?
 ---@field last_result HistoryEntry?
 ---@field history_toggled boolean
 
@@ -405,8 +404,7 @@ script.on_event(defines.events.on_gui_text_changed, function (event)
     if not gui_state then return end
 
     local result_textfield = gui_state.result_textfield
-    local input_textfield = gui_state.input_textfield
-    if not result_textfield or not input_textfield then return end
+    if not result_textfield then return end
 
     local text = event.text
     if text:len() == 0 then
@@ -422,9 +420,7 @@ script.on_event(defines.events.on_gui_text_changed, function (event)
         Utility.d("Result: "  .. result_string)
         warning_icon.visible = false
         result_textfield.text = result_string
-        state.valid_result = { expression = input_textfield.text, result = result_string, tick = event.tick }
     else
-        state.valid_result = nil
         if type(result) == "table" then
             Utility.d("Error: " .. (result.code))
             warning_icon.visible = true
@@ -491,25 +487,26 @@ end)
 script.on_event(defines.events.on_gui_confirmed, function (event)
     if event.element.name ~= C.gui.input_textfield then return end
 
-    hide(event.player_index)
-
     local state = storage.players[event.player_index]
     if not state then return end
 
-    if state.valid_result then
-        state.last_result = state.valid_result
+    local success, result = pcall(Calculator.parseExpression, event.element.text)
+    if success and result then
+        local entry = { expression = event.element.text, result = tostring(result), tick = event.tick }
+        state.last_result = entry
 
         -- Only store an expression if it's different from the last
         if List.length(state.result_history) == 0
-            or state.result_history[state.result_history.last].expression ~= state.valid_result.expression then
-            List.pushright(state.result_history, state.valid_result)
+            or state.result_history[state.result_history.last].expression ~= entry.expression then
+            List.pushright(state.result_history, entry)
+        end
+
+        if List.length(state.result_history) > Settings.history_capacity(event.player_index) then
+            List.popleft(state.result_history)
         end
     end
 
-    if List.length(state.result_history) > Settings.history_capacity(event.player_index) then
-        List.popleft(state.result_history)
-    end
-
+    hide(event.player_index)
 end)
 
 script.on_init(function()
