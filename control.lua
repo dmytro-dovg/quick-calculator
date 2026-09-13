@@ -57,16 +57,23 @@ end
 ---@param result_history List<HistoryEntry>
 local function populate_history(pane, result_history)
     pane.clear()
+    local tooltip = { "gui-quick-calculator.history-entry-tooltip" }
     for i = result_history.last, result_history.first, -1 do
         if i ~= result_history.last then
             pane.add { type = "line", direction = "horizontal", }
         end
-        local entry_flow = pane.add { type = "flow", direction = "horizontal", name = C.gui.history.flow .. tostring(i) }
+        local entry_flow = pane.add {
+            type = "flow",
+            direction = "horizontal",
+            name = C.gui.history.flow .. tostring(i),
+            tooltip = tooltip,
+        }
         entry_flow.add {
             type = "label",
             caption = result_history[i].expression,
             style = "quick-calculator_history-entry-label",
             name = C.gui.history.expression_label .. tostring(i),
+            tooltip = tooltip,
         }
         local empty_space = entry_flow.add { type = "empty-widget", }
         empty_space.style.horizontally_stretchable = true
@@ -75,6 +82,7 @@ local function populate_history(pane, result_history)
             caption = result_history[i].result,
             style = "quick-calculator_history-entry-label",
             name = C.gui.history.result_label .. tostring(i),
+            tooltip = tooltip,
         }
     end
 end
