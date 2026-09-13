@@ -1,4 +1,4 @@
-local List = require "list"
+local List = require "utils.list"
 
 -- Create result_history
 if not storage.players then return end

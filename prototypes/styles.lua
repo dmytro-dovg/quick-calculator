@@ -39,3 +39,10 @@ styles["quick-calculator_orange-label"] = {
     parent = "orange_label",
     font = "quick-calculator-mono-20",
 }
+
+styles["quick-calculator_history-entry-label"] = {
+    type = "label_style",
+    parent = "label",
+    font = "quick-calculator-mono-12",
+    hovered_font_color = gui_color.orange,
+}

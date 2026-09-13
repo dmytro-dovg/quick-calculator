@@ -1,7 +1,8 @@
 local C = require "constants"
 local Utility = require "utility"
 local Calculator = require "calculator"
-local List = require "list"
+local List = require "utils.list"
+local Settings = require "utils.settings-helper"
 
 --- @class HistoryEntry
 --- @field tick MapTick
@@ -15,6 +16,7 @@ local List = require "list"
 ---@field result_textfield LuaGuiElement?
 ---@field cross_button LuaGuiElement?
 ---@field warning_icon LuaGuiElement?
+---@field history_toggled boolean
 
 ---@class PlayerState
 ---@field gui GuiState
@@ -49,8 +51,12 @@ end
 
 ---@param player_index integer
 local function show(player_index)
-    local gui_state = player_gui_state(player_index)
+    local state = storage.players[player_index]
+    if not state then return end
+
+    local gui_state = state.gui
     if not gui_state then return end
+
     local frame = gui_state.calculator_frame
     if not frame then
         local player = game.get_player(player_index)
@@ -67,16 +73,47 @@ local function show(player_index)
         local content = frame.add { type = "flow", direction = "vertical", }
         content.style.padding = 0
         content.style.bottom_margin = 0
+        -- == History section ==
+        local history_section = content.add { type = "frame", style = "inside_shallow_frame", }
 
-        -- == Section 1 ==
-        local section_1 = content.add { type = "flow", direction = "horizontal", }
-        section_1.style.margin = 0
-        section_1.style.bottom_margin = 4
-        section_1.style.padding = 8
-        section_1.style.bottom_padding = 0
-        section_1.style.vertical_align = "center"
+        history_section.style.margin = 8
+        history_section.style.padding = 4
+        history_section.style.left_padding = 8
+        history_section.style.right_padding = 8
+        local history_pane = history_section.add { type = "scroll-pane", direction = "vertical", name="fllllo" }
 
-        local input_frame = section_1.add {
+        for i = state.result_history.first, state.result_history.last do
+            if i ~= state.result_history.first then
+                history_pane.add { type = "line", direction ="horizontal", }
+            end
+            local entry_flow = history_pane.add { type = "flow", direction = "horizontal", name=C.gui.history.flow .. tostring(i) }
+            entry_flow.add {
+                type = "label",
+                caption = state.result_history[i].expression,
+                style = "quick-calculator_history-entry-label",
+                name = C.gui.history.expression_label .. tostring(i),
+            }
+            local empty_space = entry_flow.add { type = "empty-widget", }
+            empty_space.style.horizontally_stretchable = true
+            entry_flow.add {
+                type = "label",
+                caption = state.result_history[i].result,
+                name = C.gui.history.result_label .. tostring(i),
+            }
+        end
+
+        local separator_1 = content.add { type = "line", direction ="horizontal", }
+        separator_1.style.left_margin = 0
+
+        -- == Input section ==
+        local input_section = content.add { type = "flow", direction = "horizontal", }
+        input_section.style.margin = 0
+        input_section.style.bottom_margin = 4
+        input_section.style.padding = 8
+        input_section.style.bottom_padding = 0
+        input_section.style.vertical_align = "center"
+
+        local input_frame = input_section.add {
             type = "frame",
             direction = "vertical",
             style = "inside_shallow_frame",
@@ -96,7 +133,7 @@ local function show(player_index)
         input_textfield.style.font_color = { 0.8, 0.8, 0.8 }
         input_textfield.style.font = "quick-calculator-mono-18"
 
-        local cross_button = section_1.add {
+        local cross_button = input_section.add {
             type = "sprite-button",
             name = C.gui.cross_button,
             style = "frame_action_button",
@@ -106,20 +143,33 @@ local function show(player_index)
         }
         cross_button.style.left_margin = 8
         cross_button.style.size = 28
-        cross_button.style.padding =0
+        cross_button.style.padding = 0
 
-        local separator_1 = content.add { type = "line", direction ="horizontal", }
-        separator_1.style.left_margin = 0
+        local history_button = input_section.add {
+            type = "sprite-button",
+            name = C.gui.history_button,
+            style = "frame_action_button",
+            sprite = "quick-calculator_history",
+            tooltip = { "gui-quick-calculator.clear-tooltip" },
+            resize_to_sprite = false,
+        }
 
-        -- == Section 2 ==
-        local section_2 = content.add { type = "flow", direction = "horizontal", }
-        section_2.style.top_padding = 2
-        section_2.style.left_padding = 8
-        section_2.style.right_padding = 8
-        section_2.style.horizontal_align = "center"
-        section_2.style.vertical_align = "center"
+        history_button.style.left_margin = 8
+        history_button.style.size = 28
+        history_button.style.padding = 0
 
-        local result_label = section_2.add {
+        local separator_2 = content.add { type = "line", direction ="horizontal", }
+        separator_2.style.left_margin = 0
+
+        -- == Result section ==
+        local result_section = content.add { type = "flow", direction = "horizontal", }
+        result_section.style.top_padding = 2
+        result_section.style.left_padding = 8
+        result_section.style.right_padding = 8
+        result_section.style.horizontal_align = "center"
+        result_section.style.vertical_align = "center"
+
+        local result_label = result_section.add {
             type = "label",
             caption = { "gui-quick-calculator.result_label" },
             style = "quick-calculator_orange-label",
@@ -127,7 +177,7 @@ local function show(player_index)
         result_label.style.vertical_align = "center"
         result_label.style.bottom_padding = 2
 
-        local result_textfield = section_2.add {
+        local result_textfield = result_section.add {
             type = "text-box",
             style = "quick-calculator_result-textfield",
             name = C.gui.result_textfield,
@@ -140,7 +190,7 @@ local function show(player_index)
         result_textfield.style.horizontally_stretchable = true
         result_textfield.style.maximal_width = 0
 
-        local icons = section_2.add { type = "flow", direction = "horizontal", }
+        local icons = result_section.add { type = "flow", direction = "horizontal", }
         icons.style.vertical_align = "center"
         local warning_icon = icons.add {
             type = "sprite",
@@ -195,20 +245,20 @@ local function show(player_index)
             tooltip = info_tooltip,
         }
 
-        local separator_2 = content.add { type = "line", direction ="horizontal", }
+        local separator_3 = content.add { type = "line", direction ="horizontal", }
 
-        -- == Section 3 ==
-        local section_3 = content.add { type = "flow", direction = "horizontal", }
-        section_3.style.bottom_padding = 2
-        section_3.style.vertical_align = "center"
-        section_3.style.horizontal_align = "center"
-        section_3.style.horizontally_stretchable = true
+        -- == Bottom section ==
+        local bottom_section = content.add { type = "flow", direction = "horizontal", }
+        bottom_section.style.bottom_padding = 2
+        bottom_section.style.vertical_align = "center"
+        bottom_section.style.horizontal_align = "center"
+        bottom_section.style.horizontally_stretchable = true
 
-        local dragger_1 = section_3.add { type = "empty-widget", style = "draggable_space" }
+        local dragger_1 = bottom_section.add { type = "empty-widget", style = "draggable_space" }
         dragger_1.style.vertically_stretchable = true
         dragger_1.style.horizontally_stretchable = true
 
-        local instruction_label = section_3.add {
+        local instruction_label = bottom_section.add {
             type = "label",
             style = "grey_label",
             caption = { "gui-quick-calculator.instructions" },
@@ -216,12 +266,20 @@ local function show(player_index)
         instruction_label.style.margin = 0
         instruction_label.style.horizontally_squashable = true
 
-        local dragger_2 = section_3.add { type = "empty-widget", style = "draggable_space_header" }
+        local dragger_2 = bottom_section.add { type = "empty-widget", style = "draggable_space_header" }
         dragger_2.style.horizontally_stretchable = true
         dragger_2.style.vertically_stretchable = true
 
-        for _, element in pairs({ section_3, separator_1, separator_2, result_label, instruction_label }) do
+        for _, element in pairs({ bottom_section, separator_1, separator_2, separator_3, result_label, instruction_label }) do
             element.ignored_by_interaction = true
+        end
+
+        if Settings.remember_last_expression(player_index) then
+            local last_entry = state.result_history[state.result_history.last]
+            if last_entry then
+                input_textfield.text = last_entry.expression
+                result_textfield.text = last_entry.result
+            end
         end
 
         content.drag_target = frame
@@ -364,7 +422,10 @@ script.on_event(defines.events.on_gui_text_changed, function (event)
 end)
 
 script.on_event(defines.events.on_gui_click, function(event)
-    local gui_state = player_gui_state(event.player_index)
+    local state = storage.players[event.player_index]
+    if not state then return end
+
+    local gui_state = state.gui
     if not gui_state then return end
 
     local main_frame = gui_state.calculator_frame
@@ -377,6 +438,14 @@ script.on_event(defines.events.on_gui_click, function(event)
     -- Refocus on input textfield
     if is_descendant(event.element, main_frame) and input_textfield and result_textfield and event.element ~= result_textfield then
         input_textfield.focus()
+    end
+
+    -- History
+    local history_entry_index = tonumber(event.element.name:match(C.gui.history.pattern))
+    if history_entry_index then
+        local history_entry = state.result_history[history_entry_index]
+        input_textfield.text = history_entry.expression
+        result_textfield.text = history_entry.result
     end
 
     -- Clear button
@@ -403,10 +472,12 @@ script.on_event(defines.events.on_gui_confirmed, function (event)
     local state = storage.players[event.player_index]
     if not state then return end
 
-    if state.valid_result then
+    -- Only store an expression if it's different from the last
+    if state.valid_result and state.result_history[state.result_history.last].expression ~= state.valid_result.expression then
         List.pushright(state.result_history, state.valid_result)
     end
-    if List.length(state.result_history) > 3 then
+
+    if List.length(state.result_history) > Settings.history_capacity(event.player_index) then
         List.popleft(state.result_history)
     end
     valid_result = nil
@@ -436,5 +507,17 @@ script.on_configuration_changed(function(event)
         local frame = state.gui.calculator_frame
         if frame then frame.destroy() end
         state.gui = { }
+    end
+end)
+
+script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)
+    if event.setting ~= "quick-calculator_history-capacity" then return end
+
+    local state = storage.players[event.player_index]
+    if not state then return end
+
+    -- Trim history according to new settings
+    while List.length(state.result_history) > Settings.history_capacity(event.player_index) do
+        List.popleft(state.result_history)
     end
 end)

@@ -30,4 +30,14 @@ local tag_cross = {
     flags = {"gui-icon"},
 }
 
-data:extend({ info, warn, tag_cross, })
+local history = {
+    type = "sprite",
+    name = "quick-calculator_history",
+    filename = "__quick-calculator__/graphics/icons/history.png",
+    size = 56,
+    scale = 0.5,
+    mipmap_count = 2,
+    flags = {"gui-icon"},
+}
+
+data:extend({ info, warn, tag_cross, history, })
