@@ -231,7 +231,7 @@ local function show(player_index)
         history_section.style.margin = 8
         history_section.style.padding = 0
         local history_pane = history_section.add { type = "scroll-pane", direction = "vertical", style = "naked_scroll_pane", }
-        history_pane.style.maximal_height = 200
+        history_pane.style.maximal_height = 160
         history_pane.style.padding = 4
         history_pane.style.left_padding = 8
         history_pane.style.right_padding = 8
