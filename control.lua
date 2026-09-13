@@ -1,6 +1,12 @@
 local C = require "constants"
 local Utility = require "utility"
 local Calculator = require "calculator"
+local List = require "list"
+
+--- @class HistoryEntry
+--- @field tick MapTick
+--- @field expression string
+--- @field result string
 
 ---@class GuiState
 ---@field calculator_frame LuaGuiElement?
@@ -12,6 +18,8 @@ local Calculator = require "calculator"
 
 ---@class PlayerState
 ---@field gui GuiState
+---@field result_history List<HistoryEntry>
+---@field valid_result HistoryEntry?
 
 ---@class ModStorage
 ---@field players table<integer, PlayerState>
@@ -262,7 +270,8 @@ local function init_player(player_index)
     storage.players = storage.players or { }
     if storage.players[player_index] then return end
     storage.players[player_index] = {
-        gui = { }
+        gui = { },
+        result_history = List.new(),
     }
 end
 
@@ -315,10 +324,14 @@ script.on_event(defines.events.on_lua_shortcut, function(event)
     toggle(event.player_index)
 end)
 
+
 script.on_event(defines.events.on_gui_text_changed, function (event)
     if event.element.name ~= C.gui.input_textfield then return end
 
-    local gui_state = player_gui_state(event.player_index)
+    local state = storage.players[event.player_index]
+    if not state then return end
+
+    local gui_state = state.gui
     if not gui_state then return end
 
     local result_textfield = gui_state.result_textfield
@@ -335,10 +348,13 @@ script.on_event(defines.events.on_gui_text_changed, function (event)
     local success, result = pcall(Calculator.parseExpression, text)
     local warning_icon = gui_state.warning_icon
     if success and result then
-        Utility.d("Result: "  .. result)
+        local result_string = tostring(result)
+        Utility.d("Result: "  .. result_string)
         warning_icon.visible = false
-        result_textfield.text = tostring(result)
+        result_textfield.text = result_string
+        state.valid_result = { expression = input_textfield.text, result = result_string, tick = event.tick }
     else
+        state.valid_result = nil
         if type(result) == "table" then
             Utility.d("Error: " .. (result.code))
             warning_icon.visible = true
@@ -383,6 +399,18 @@ end)
 
 script.on_event(defines.events.on_gui_confirmed, function (event)
     if event.element.name ~= C.gui.input_textfield then return end
+
+    local state = storage.players[event.player_index]
+    if not state then return end
+
+    if state.valid_result then
+        List.pushright(state.result_history, state.valid_result)
+    end
+    if List.length(state.result_history) > 3 then
+        List.popleft(state.result_history)
+    end
+    valid_result = nil
+    localised_print(serpent.block(state.result_history))
     hide(event.player_index)
 end)
 
