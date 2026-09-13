@@ -103,6 +103,7 @@ local function show(player_index)
             entry_flow.add {
                 type = "label",
                 caption = state.result_history[i].result,
+                style = "quick-calculator_history-entry-label",
                 name = C.gui.history.result_label .. tostring(i),
             }
         end
@@ -466,6 +467,7 @@ script.on_event(defines.events.on_gui_click, function(event)
         local history_entry = state.result_history[history_entry_index]
         input_textfield.text = history_entry.expression
         result_textfield.text = history_entry.result
+        return
     end
 
     -- Clear button
