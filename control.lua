@@ -152,20 +152,22 @@ local function show(player_index)
         cross_button.style.size = 28
         cross_button.style.padding = 0
 
-        local history_button = input_section.add {
-            type = "sprite-button",
-            name = C.gui.history_button,
-            style = "frame_action_button",
-            sprite = "quick-calculator_history",
-            tooltip = { "gui-quick-calculator.history-tooltip" },
-            resize_to_sprite = false,
-        }
+        if Settings.history_capacity(player_index) > 0 then
+            local history_button = input_section.add {
+                type = "sprite-button",
+                name = C.gui.history_button,
+                style = "frame_action_button",
+                sprite = "quick-calculator_history",
+                tooltip = { "gui-quick-calculator.history-tooltip" },
+                resize_to_sprite = false,
+            }
 
-        history_button.style.left_margin = 8
-        history_button.style.size = 28
-        history_button.style.padding = 0
-        history_button.enabled = has_history
-        history_button.toggled = show_history
+            history_button.style.left_margin = 8
+            history_button.style.size = 28
+            history_button.style.padding = 0
+            history_button.enabled = has_history
+            history_button.toggled = show_history
+        end
 
         local separator_2 = content.add { type = "line", direction ="horizontal", }
         separator_2.style.left_margin = 0
@@ -379,14 +381,14 @@ local function process_calculate_command(command)
     end
 end
 
+---@diagnostic disable-next-line: assign-type-mismatch
 commands.add_command("qcalc", { "command-help.qcalc", "qcalc" }, function (command)
     process_calculate_command(command)
 end)
 
 script.on_event("quick-calculator-toggle", function(event)
-    ---@diagnostic disable: undefined-field
+    ---@diagnostic disable-next-line: undefined-field
     toggle(event.player_index)
-    ---@diagnostic enable: undefined-field
 end)
 
 script.on_event(defines.events.on_lua_shortcut, function(event)
