@@ -75,42 +75,8 @@ local function show(player_index)
         local content = frame.add { type = "flow", direction = "vertical", }
         content.style.padding = 0
         content.style.bottom_margin = 0
-        -- == History section ==
         local has_history = List.length(state.result_history) > 0
         local show_history = has_history and (state.history_toggled or false)
-        local history_section = content.add { type = "frame", style = "inside_shallow_frame", }
-        history_section.visible = show_history
-
-        history_section.style.margin = 8
-        history_section.style.padding = 4
-        history_section.style.left_padding = 8
-        history_section.style.right_padding = 8
-        local history_pane = history_section.add { type = "scroll-pane", direction = "vertical" }
-
-        for i = state.result_history.first, state.result_history.last do
-            if i ~= state.result_history.first then
-                history_pane.add { type = "line", direction ="horizontal", }
-            end
-            local entry_flow = history_pane.add { type = "flow", direction = "horizontal", name=C.gui.history.flow .. tostring(i) }
-            entry_flow.add {
-                type = "label",
-                caption = state.result_history[i].expression,
-                style = "quick-calculator_history-entry-label",
-                name = C.gui.history.expression_label .. tostring(i),
-            }
-            local empty_space = entry_flow.add { type = "empty-widget", }
-            empty_space.style.horizontally_stretchable = true
-            entry_flow.add {
-                type = "label",
-                caption = state.result_history[i].result,
-                style = "quick-calculator_history-entry-label",
-                name = C.gui.history.result_label .. tostring(i),
-            }
-        end
-
-        local separator_1 = content.add { type = "line", direction ="horizontal", }
-        separator_1.style.left_margin = 0
-        separator_1.visible = show_history
 
         -- == Input section ==
         local input_section = content.add { type = "flow", direction = "horizontal", }
@@ -169,8 +135,8 @@ local function show(player_index)
             history_button.toggled = show_history
         end
 
-        local separator_2 = content.add { type = "line", direction ="horizontal", }
-        separator_2.style.left_margin = 0
+        local input_separator = content.add { type = "line", direction ="horizontal", }
+        input_separator.style.left_margin = 0
 
         -- == Result section ==
         local result_section = content.add { type = "flow", direction = "horizontal", }
@@ -256,7 +222,44 @@ local function show(player_index)
             tooltip = info_tooltip,
         }
 
-        local separator_3 = content.add { type = "line", direction ="horizontal", }
+        local result_separator = content.add { type = "line", direction ="horizontal", }
+
+        -- == History section ==
+        local history_section = content.add { type = "frame", style = "inside_shallow_frame", }
+        history_section.visible = show_history
+
+        history_section.style.margin = 8
+        history_section.style.padding = 0
+        local history_pane = history_section.add { type = "scroll-pane", direction = "vertical", style = "naked_scroll_pane", }
+        history_pane.style.maximal_height = 200
+        history_pane.style.padding = 4
+        history_pane.style.left_padding = 8
+        history_pane.style.right_padding = 8
+        history_pane.style.margin = 0
+        for i = state.result_history.last, state.result_history.first, -1 do
+            if i ~= state.result_history.last then
+                history_pane.add { type = "line", direction ="horizontal", }
+            end
+            local entry_flow = history_pane.add { type = "flow", direction = "horizontal", name=C.gui.history.flow .. tostring(i) }
+            entry_flow.add {
+                type = "label",
+                caption = state.result_history[i].expression,
+                style = "quick-calculator_history-entry-label",
+                name = C.gui.history.expression_label .. tostring(i),
+            }
+            local empty_space = entry_flow.add { type = "empty-widget", }
+            empty_space.style.horizontally_stretchable = true
+            entry_flow.add {
+                type = "label",
+                caption = state.result_history[i].result,
+                style = "quick-calculator_history-entry-label",
+                name = C.gui.history.result_label .. tostring(i),
+            }
+        end
+
+        local history_separator = content.add { type = "line", direction ="horizontal", }
+        history_separator.style.left_margin = 0
+        history_separator.visible = show_history
 
         -- == Bottom section ==
         local bottom_section = content.add { type = "flow", direction = "horizontal", }
@@ -281,7 +284,7 @@ local function show(player_index)
         dragger_2.style.horizontally_stretchable = true
         dragger_2.style.vertically_stretchable = true
 
-        for _, element in pairs({ bottom_section, separator_1, separator_2, separator_3, result_label, instruction_label }) do
+        for _, element in pairs({ bottom_section, input_separator, result_separator, history_separator, result_label, instruction_label }) do
             element.ignored_by_interaction = true
         end
 
@@ -299,7 +302,7 @@ local function show(player_index)
         gui_state.cross_button = cross_button
         gui_state.warning_icon = warning_icon
         gui_state.history_section = history_section
-        gui_state.history_separator = separator_1
+        gui_state.history_separator = history_separator
 
         input_textfield.focus()
         player.opened = frame
