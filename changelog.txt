@@ -1,5 +1,5 @@
 ---------------------------------------------------------------------------------------------------
-Version: 2.1.10
+Version: 2.0.10
 Date: 2026-09-14
   Features:
     - Added history panel. Configurable to store up to 16 previous results.
