@@ -496,7 +496,7 @@ script.on_event(defines.events.on_gui_click, function(event)
             end
             if gui_state.history_button then
                 gui_state.history_button.enabled = List.length(state.result_history) > 0
-                gui_state.history_button.toggled = false
+                gui_state.history_button.toggled = List.length(state.result_history) > 0
             end
         end
         return
