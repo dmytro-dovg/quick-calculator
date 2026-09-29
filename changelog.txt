@@ -3,6 +3,8 @@ Version: 2.1.11
 Date: 2026-xx-xx
   Bugfixes:
     - Fixed the history button toggling off when an entry is deleted.
+  Locale:
+    - Added missing "Toggle calculator" controls string for English and Ukrainian.
 ---------------------------------------------------------------------------------------------------
 Version: 2.1.10
 Date: 2026-09-14
